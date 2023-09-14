@@ -1,5 +1,3 @@
-# FitMedia
-
 Klone das Repository mit folgendem Befehl:
 
 ```

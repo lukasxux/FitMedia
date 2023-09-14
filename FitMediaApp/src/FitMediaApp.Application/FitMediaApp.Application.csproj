@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+	  <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.*" />
+    <PackageReference Include="Bogus" Version="34.*" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.*" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Model\" />
+    <Folder Include="Infastrucure\" />
+  </ItemGroup>
+
+</Project>
