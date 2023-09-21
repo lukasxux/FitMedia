@@ -1,0 +1,35 @@
+@startuml
+User <-- Post
+Post <-- Commentar
+
+class User {
+Guid : Guid
+id : int
+mail : string
+username : string
+initialPassword : string
+profilePicPath : string
+bio : string
+Posts : List<Post>
+follower : List<User>
+following : List<User>
+}
+
+class Post {
+date : Datetime
+image : ImageFile
+description : string
+filePath : string
+commentar : Commentar
+}
+ 
+class Commentar{
+User : User
+text : string
+date : DateTime 
+}
+
+
+
+
+@enduml                             
