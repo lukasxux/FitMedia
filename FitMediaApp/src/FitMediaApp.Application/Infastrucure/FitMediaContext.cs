@@ -56,7 +56,7 @@ namespace FitMediaApp.Application.Infastrucure
             Randomizer.Seed = new Random(1039);
             var faker = new Faker("de");
 
-            var authors = new Faker<User>("de").CustomInstantiator(f =>
+            var users = new Faker<User>("de").CustomInstantiator(f =>
             {
                 return new User(
                     mail: f.Name.FirstName() + "@gmail.com",
@@ -67,29 +67,40 @@ namespace FitMediaApp.Application.Infastrucure
                 { Guid = f.Random.Guid() };
             })
             .Generate(10)
-            .GroupBy(a => a.Username).Select(g => g.First())
             .ToList();
-            Users.AddRange(authors);
+            Users.AddRange(users);
             SaveChanges();
 
             var posts = new Faker<Post>("de").CustomInstantiator(f =>
             {
-                   
-                
+                return new Post(
+                    date: f.Date.Past(),
+                    filePathPic: "Path/To/Your/Picture",
+                    description: f.Lorem.Sentence());
             })
-                .Generate(10)
-                .GroupBy(a => a.Id).Select(g => g.First())
-                .ToList;
+            .Generate(10)
+            .ToList();
             Posts.AddRange(posts);
             SaveChanges();
-    
 
+            foreach (var post in posts)
+            {
+                var comments = new Faker<Comment>("de").CustomInstantiator(f =>
+                {
+                    return new Comment(
+                        user: faker.PickRandom(users),
+                        text: f.Lorem.Sentence(),
+                        date: f.Date.Past());
+                })
+                .Generate(5) // Generate 5 comments for each post
+                .ToList();
 
+                post.Comments.AddRange(comments);
+            }
 
-
-
-
+            SaveChanges();
         }
+
 
 
 

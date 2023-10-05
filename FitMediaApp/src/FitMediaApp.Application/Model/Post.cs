@@ -8,22 +8,20 @@ using System.Threading.Tasks;
 
 namespace FitMediaApp.Application.Model
 {
-
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Options;
     using System;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Diagnostics.CodeAnalysis;
-    using TeamsDemoApp.Application.Model;
+    using FitMediaApp.Application.Model;
 
     public class Post : IEntity<int>
     {
         public Post(DateTime date,string filePathPic, string description) { 
-            Date =date;
-            FilePathPic =filePathPic;
-            Description =description;   
-        
+            Date = date;
+            FilePathPic = filePathPic;
+            Description = description;   
         }
 
         #pragma warning disable CS8618
@@ -39,8 +37,6 @@ namespace FitMediaApp.Application.Model
         public string FilePathPic { get; set; }
         public string Description { get; set; }
         public List<Comment> Comments { get; } = new();
-
-
 
     }
 }

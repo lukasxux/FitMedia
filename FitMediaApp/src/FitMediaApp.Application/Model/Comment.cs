@@ -15,7 +15,7 @@ namespace FitMediaApp.Application.Model
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Diagnostics.CodeAnalysis;
-    using TeamsDemoApp.Application.Model;
+    using FitMediaApp.Application.Model;
 
     public class Comment : IEntity<int>
     {
