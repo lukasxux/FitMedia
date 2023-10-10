@@ -1,3 +1,4 @@
+using FitMediaApp.Application.Dto;
 using FitMediaApp.Application.Infastrucure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,7 @@ builder.Services.AddDbContext<FitMediaContext>(opt =>
 // Add services to the container.
 
 builder.Services.AddControllers();
-
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 // Der Vue.JS Devserver läuft auf einem anderen Port, deswegen brauchen wir diese Konfiguration
 if (builder.Environment.IsDevelopment())
 {

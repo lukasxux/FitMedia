@@ -4,9 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace FitMediaApp.Application.Dto
 {
-    internal class PostDto
-    {
+
+        public record PostDto(
+        Guid Guid,
+        DateTime Date,
+        string FilePathPic,
+        string Description,
+        List<CommentDto> Comments
+    );
     }
-}
+
