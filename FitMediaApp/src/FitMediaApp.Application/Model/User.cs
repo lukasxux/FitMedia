@@ -45,7 +45,8 @@ namespace FitMediaApp.Application.Model
         public String? Bio { get; set; }
         public string Salt { get; set; }
         public string PasswordHash { get; set; }
-        public List<Post> Posts { get; } = new();
+        
+        public List<Post> Posts { get; } = new List<Post>();
         public List<User> Followers { get; } = new();
         public List<User> Following { get; } = new();
 

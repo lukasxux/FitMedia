@@ -12,5 +12,4 @@ namespace FitMediaApp.Application.Dto
                string Text,
                DateTime Date
            );
-    
 }
