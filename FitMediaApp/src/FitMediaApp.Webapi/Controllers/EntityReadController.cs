@@ -5,9 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
+using FitMediaApp.Application.Dto;
+using FitMediaApp.Application.Infastrucure.Repositories;
 using FitMediaApp.Application.Model;
+using System.Linq.Expressions;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace FitMediaApp.Webapi.Controllers
 {
@@ -15,17 +19,19 @@ namespace FitMediaApp.Webapi.Controllers
     [ApiController]
     public abstract class EntityReadController<TEntity> : ControllerBase where TEntity : class, IEntity
     {
-        protected readonly FitMediaContext _db;
+        protected readonly IQueryable<TEntity> _set;
+        protected readonly IModel _model;     // For dynamic query expansion
         protected readonly IMapper _mapper;
-        protected EntityReadController(FitMediaContext db, IMapper mapper)
+        protected EntityReadController(IQueryable<TEntity> set, IModel model, IMapper mapper)
         {
-            _db = db;
+            _set = set;
+            _model = model;
             _mapper = mapper;
         }
 
         protected async Task<IActionResult> GetAll<TDto>(Expression<Func<TEntity, TDto>> projection)
         {
-            var result = await _db.Set<TEntity>()
+            var result = await _set
                 .Select(projection)
                 .ToListAsync();
             return Ok(result);
@@ -33,28 +39,49 @@ namespace FitMediaApp.Webapi.Controllers
 
         protected async Task<IActionResult> GetAll<TDto>()
         {
-            var result = await _mapper
-                .ProjectTo<TDto>(_db.Set<TEntity>())
-                .ToListAsync();
-            return Ok(result);
+            var query = _set;
+            query = ExpandQueryByParam(query);  // Add includes
+            var data = await ExpandQueryByParam(query).ToListAsync();
+            return Ok(_mapper.Map<IList<TDto>>(data));
         }
 
         protected async Task<IActionResult> GetByGuid<TDto>(Guid guid)
         {
-            var result = await _mapper.ProjectTo<TDto>(_db.Set<TEntity>().Where(e => e.Guid == guid))
+            var query = _set;
+            query = ExpandQueryByParam(query);  // Add includes
+            var data = await ExpandQueryByParam(query).Where(a => a.Guid == guid).FirstOrDefaultAsync();
+            if (data is null) return NotFound();
+            return Ok(_mapper.Map<TDto>(data));
+        }
+
+        protected async Task<IActionResult> GetByGuid<TDto>(Guid guid, Expression<Func<TEntity, TDto>> projection)
+        {
+            var result = await _set
+                .Where(e => e.Guid == guid)
+                .Select(projection)
                 .FirstOrDefaultAsync();
             if (result is null) return NotFound();
             return Ok(result);
         }
 
-        protected async Task<IActionResult> GetByGuid<TDto>(Guid guid, Expression<Func<TEntity, TDto>> projection)
+        protected IQueryable<TEntity> ExpandQueryByParam(IQueryable<TEntity> query)
         {
-            var result = await _db.Set<TEntity>()
-                .Where(e=>e.Guid == guid)
-                .Select(projection)
-                .FirstOrDefaultAsync();
-            if (result is null) return NotFound();
-            return Ok(result);
+            // Suche z. B. den Entity Type Handin
+            var entity = _model.FindEntityType(typeof(TEntity));
+            if (entity is null) { throw new ApplicationException($"Entity {typeof(TEntity).Name} not found."); }
+
+            // HTTP Request im Controller analysiere die Parameter
+            // $expand=Student,Task soll ausgelesen werden.
+            if (!HttpContext.Request.Query.TryGetValue("$expand", out var paramValues))
+                return query;
+            // values wäre dann [Student, Task]
+            var values = paramValues.SelectMany(v => v.Split(",")).ToList();
+
+            var expandNavigations = entity.GetNavigations()
+                .Where(n => values.Contains(n.Name) || values.Contains(n.Name.ToLower())).Select(n => n.Name);
+            foreach (var navigation in expandNavigations)
+                query = query.Include(navigation);                // _db.Set<Handin>().Include(h=>h.Student)
+            return query;
         }
     }
 }

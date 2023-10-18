@@ -9,12 +9,12 @@ namespace FitMediaApp.Application.Dto
 {
 
         public record UserDto(
-       Guid Guid,
-       string Username,
-       string Mail,
-       string ProfilePicPath,
-       string? Bio,
-       List<Post> Posts,
-       List<User> Followers,
-       List<User> Following );
+            Guid Guid,
+            string Username,
+            string Mail,
+            string ProfilePicPath,
+            string? Bio,
+            List<Post> Posts,
+            List<User> Followers,
+            List<User> Following );
     }

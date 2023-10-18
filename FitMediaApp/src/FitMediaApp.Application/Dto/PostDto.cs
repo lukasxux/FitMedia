@@ -15,5 +15,5 @@ namespace FitMediaApp.Application.Dto
         string Description,
         List<CommentDto> Comments
     );
-    }
+}
 

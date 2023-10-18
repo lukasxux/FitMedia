@@ -9,28 +9,20 @@ using System.Threading.Tasks;
 using FitMediaApp.Application.Dto;
 using FitMediaApp.Application.Model;
 using System.Threading;
+using FitMediaApp.Application.Infastrucure.Repositories;
 
 namespace FitMediaApp.Webapi.Controllers
 {
 
     public class UserController : EntityReadController<User>
     {
-        public UserController(FitMediaContext db, IMapper mapper) : base(db, mapper)
+        private readonly UserRepository _repo;
+        public UserController(IMapper mapper, UserRepository repo) : base(repo.Set, repo.Model, mapper)
         {
-
+            _repo = repo;
         }
         [HttpGet]
-        public async Task<IActionResult> GetUsers() => await GetAll(u =>
-        new
-        {
-            u.Guid,
-            u.Mail,
-            u.Username,
-            u.Bio,
-            FollowerCount = u.Followers.ToArray().Length,
-            FollowingCount = u.Following.ToArray().Length,
-            PostCount = u.Posts.ToArray().Length,
-        });
+        public async Task<IActionResult> GetUsers() => await GetAll<UserDto>();
 
         [HttpGet("{guid}")]
         public async Task<IActionResult> GetUser(Guid guid) => await GetByGuid(guid ,u =>
