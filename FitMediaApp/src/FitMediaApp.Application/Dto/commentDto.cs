@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace FitMediaApp.Application.Dto
 {
-    internal class commentDto
-    {
-    }
+        public record CommentDto(
+               Guid Guid,
+               int UserId,
+               string Text,
+               DateTime Date
+           );
+    
 }
