@@ -14,6 +14,7 @@ namespace FitMediaApp.Application.Dto
             CreateMap<User, UserDto>();
             CreateMap<Post, PostDto> ();
             CreateMap<Comment, CommentDto> ();
+            CreateMap<UserRegisterDto, User>();
         }
     }
 }

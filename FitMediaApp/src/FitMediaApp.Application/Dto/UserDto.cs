@@ -14,7 +14,7 @@ namespace FitMediaApp.Application.Dto
             string Mail,
             string ProfilePicPath,
             string? Bio,
-            List<Post> Posts,
+            List<PostDto> Posts,
             List<User> Followers,
             List<User> Following );
-    }
+        }
