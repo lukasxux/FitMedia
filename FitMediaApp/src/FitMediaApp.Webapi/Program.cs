@@ -1,27 +1,48 @@
+ï»¿using FitMediaApp.Application.Infastrucure;
 using FitMediaApp.Application.Dto;
-using FitMediaApp.Application.Infastrucure;
-using FitMediaApp.Application.Infastrucure.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using FitMediaApp.Application.Infastrucure.Repositories;
+using System;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
+// See appsettings.json for configuration.
 builder.Services.AddDbContext<FitMediaContext>(opt =>
-    opt.UseSqlite(builder.Configuration.GetConnectionString("Default")));
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("Default"),
+        o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery)));
 
+builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<PostRepository>();
+// Add automapper
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // Add services to the container.
-builder.Services.AddScoped<PostRepository>();
 builder.Services.AddControllers();
-builder.Services.AddAutoMapper(typeof(MappingProfile));
-// Der Vue.JS Devserver läuft auf einem anderen Port, deswegen brauchen wir diese Konfiguration
+// Der Vue.JS Devserver lï¿½uft auf einem anderen Port, deswegen brauchen wir diese Konfiguration
 if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddCors(options =>
         options.AddDefaultPolicy(builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 }
+
+byte[] secret = Convert.FromBase64String(builder.Configuration["Secret"]);
+builder.Services
+    .AddAuthentication(options => options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(secret),
+            ValidateAudience = false,
+            ValidateIssuer = false
+        };
+    });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -34,14 +55,13 @@ using (var scope = app.Services.CreateScope())
     {
         if (app.Environment.IsDevelopment())
             db.Database.EnsureDeleted();
-        db.Database.EnsureCreated();
+            db.Database.EnsureCreated();
         if (app.Environment.IsDevelopment())
             db.Seed();
     }
 }
 
 app.UseHttpsRedirection();
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseCors();
@@ -51,12 +71,10 @@ if (app.Environment.IsDevelopment())
 
 // Liefert die statischen Dateien, die von VueJS generiert werden, aus.
 app.UseStaticFiles();
-//Ab hier werden alle calls bearbeitet, die an die Api gehen
+// Ab hier werden alle calls bearbeitet, die an die api gehen.
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-// Bearbeitet die Routen, für die wir Controller geschrieben haben.
-app.MapControllers();
-// Wichtig für das clientseitige Routing, damit wir direkt an eine URL in der Client App steuern können.
+// Wichtig fï¿½r das clientseitige Routing, damit wir direkt an eine URL in der Client App steuern kï¿½nnen.
 app.MapFallbackToFile("index.html");
 app.Run();

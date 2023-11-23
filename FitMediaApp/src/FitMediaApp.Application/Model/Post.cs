@@ -18,7 +18,8 @@ namespace FitMediaApp.Application.Model
 
     public class Post : IEntity<int>
     {
-        public Post(DateTime date,string filePathPic, string description) { 
+        public Post(User user, DateTime date,string filePathPic, string description) {
+            User = user;
             Date = date;
             FilePathPic = filePathPic;
             Description = description;   
@@ -32,6 +33,7 @@ namespace FitMediaApp.Application.Model
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public Guid Guid { get; set; }
+        public User User { get; set; }
 
         public DateTime Date { get; set; }
         public string FilePathPic { get; set; }

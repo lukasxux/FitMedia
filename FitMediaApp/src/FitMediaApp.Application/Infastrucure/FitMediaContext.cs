@@ -74,6 +74,7 @@ namespace FitMediaApp.Application.Infastrucure
             var posts = new Faker<Post>("de").CustomInstantiator(f =>
             {
                 return new Post(
+                    user: f.PickRandom(users),
                     date: f.Date.Past(),
                     filePathPic: "Path/To/Your/Picture",
                     description: f.Lorem.Sentence());

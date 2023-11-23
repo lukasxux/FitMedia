@@ -28,7 +28,10 @@ namespace FitMediaApp.Application.Infastrucure.Repositories
         }
 
 
-
+        public override async Task<(bool success, string message)> Insert(User user)
+        {
+           return await base.Insert(user);
+        }
 
 
     }
