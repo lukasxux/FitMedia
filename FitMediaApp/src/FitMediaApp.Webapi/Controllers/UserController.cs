@@ -14,6 +14,10 @@ using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
+using Docker.DotNet;
+using Microsoft.AspNetCore.Authentication;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FitMediaApp.Webapi.Controllers
 {
@@ -21,20 +25,23 @@ namespace FitMediaApp.Webapi.Controllers
     public class UserController : EntityReadController<User>
     {
         private readonly UserRepository _repo;
+        private readonly PostRepository _postRepository;
         private readonly FitMediaContext _db;
         private readonly IConfiguration _config;
 
-        public UserController(IMapper mapper, UserRepository repo, FitMediaContext db, IConfiguration config) : base(repo.Set, repo.Model, mapper)
+        public UserController(IMapper mapper, UserRepository repo, FitMediaContext db, IConfiguration config, PostRepository postRepository) : base(repo.Set, repo.Model, mapper)
         {
             _repo = repo;
             _db = db;
             _config = config;
+            _postRepository = postRepository;
+
         }
         [HttpGet]
         public async Task<IActionResult> GetUsers() => await GetAll<UserDto>();
 
         [HttpGet("{guid}")]
-        public async Task<IActionResult> GetUser(Guid guid) => await GetByGuid(guid ,u =>
+        public async Task<IActionResult> GetUser(Guid guid) => await GetByGuid(guid, u =>
         new
         {
             u.Guid,
@@ -46,13 +53,32 @@ namespace FitMediaApp.Webapi.Controllers
             PostCount = u.Posts.ToArray().Length,
         });
 
-        [HttpDelete("{guid}")]
-        public async Task<IActionResult> DeleteUser(Guid guid)
+        [Authorize]
+        [HttpDelete()]
+        public async Task<IActionResult> DeleteUser()
         {
-            var (success, message) = await _repo.Delete(guid);
-            if (!success) return BadRequest(message);
-            return NoContent();
+            var authenticated = HttpContext.User.Identity?.IsAuthenticated ?? false;
+            if (!authenticated) { return Unauthorized(); }
+            var mail = HttpContext.User.Identity?.Name;
+            if (mail is null) { return Unauthorized(); }
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Mail == mail);
+            if (user is null) { return Unauthorized(); }
+            var deleteUserResult = await _repo.Delete(user.Guid);
+            if (!deleteUserResult.success)
+            {
+                return BadRequest(deleteUserResult.message);
+            }
+
+            var deletePostsResult = await _postRepository.DeletePostsForUser(user.Guid);
+            if (!deletePostsResult.success)
+            {
+                return BadRequest(deletePostsResult.message);
+            }
+
+            return Ok("User and associated posts deleted successfully");
+
         }
+
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserRegisterDto newUser)
@@ -71,44 +97,58 @@ namespace FitMediaApp.Webapi.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] UserLoginDto loginDto)
+        public async Task<IActionResult> Login([FromBody] UserLoginDto credentials)
         {
-
-            var secret = Convert.FromBase64String(_config["Secret"]);
-            var lifetime = TimeSpan.FromHours(3);
-            // Find the user in the database based on the provided email
-            var user = _db.Users.FirstOrDefault(u => u.Mail == loginDto.Email);
-
-            // If the user is not found or the password doesn't match, return an unauthorized response
-            if (user == null || !user.CheckPassword(loginDto.Password))
+            var user = await _db.Users.FirstOrDefaultAsync(a => a.Mail == credentials.Email);
+            if (user is null || !user.CheckPassword(credentials.Password)) return BadRequest("Password falsch oder User gibt es nicht");
+            var claims = new List<Claim>
             {
-                return Unauthorized("Invalid email or password.");
-            }
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                // Payload for our JWT.
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                // Write username to the claim (the "data zone" of the JWT).
-                new Claim(ClaimTypes.Name, user.Username.ToString()),
-                    // Write the role to the claim (optional)
-                }),
-                Expires = DateTime.UtcNow + lifetime,
-                SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(secret),
-                    SecurityAlgorithms.HmacSha256Signature)
+            new Claim(ClaimTypes.Name, credentials.Email),
+            //new Claim(ClaimTypes.Role, "admin")
             };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            // Return the token so the client can save this to send a bearer token in the
-            // subsequent requests.
-            return Ok(new
+            var claimsIdentity = new ClaimsIdentity(
+                claims,
+                Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme);
+
+            var authProperties = new AuthenticationProperties
             {
-                user.Username,
-                UserGuid = user.Guid,
-                Token = tokenHandler.WriteToken(token)
-            });
+                AllowRefresh = true,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(3),
+            };
+
+            await HttpContext.SignInAsync(
+                Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(claimsIdentity),
+                authProperties);
+            return Ok("Sucess!!!");
         }
+
+        [Authorize]
+        [HttpPost("follow/{username}")]
+        public async Task<IActionResult> Follow(string username)
+        {
+            var authenticated = HttpContext.User.Identity?.IsAuthenticated ?? false;
+            if (!authenticated) { return Unauthorized(); }
+            var mail = HttpContext.User.Identity?.Name;
+            var userSender = await _db.Users.FirstOrDefaultAsync(u => u.Mail == mail);
+            if (userSender is null) { return Unauthorized(); }
+            var userRecipient = await _db.Users.FirstOrDefaultAsync(a => a.Username == username);
+            if (userRecipient is null) { return BadRequest(); }
+            var follow = await _db.Followers.FirstOrDefaultAsync(a => a.Follows == userSender && a.Following == userRecipient);
+            if (follow is not null)
+            {
+                _db.Followers.Remove(follow);
+                try { await _db.SaveChangesAsync(); }
+                catch (DbUpdateException e) { return BadRequest(e.Message); }
+                return Ok(_db.Followers.Where(a => a.Following.Guid == userRecipient.Guid).Count());
+            }
+            var follower = new Follower(userSender, userRecipient);
+            _db.Followers.Add(follower);
+            try { await _db.SaveChangesAsync(); }
+            catch (DbUpdateException e) { return BadRequest(e.Message); }
+            return Ok(_db.Followers.Where(a => a.Following.Guid == userRecipient.Guid).Count());
+        }
+
     }
 }
+

@@ -13,7 +13,8 @@ namespace FitMediaApp.Application.Dto
         DateTime Date,
         string FilePathPic,
         string Description,
-        List<CommentDto> Comments
+        List<CommentDto> Comments,
+        List<UserDto> Likes
     );
 }
 
