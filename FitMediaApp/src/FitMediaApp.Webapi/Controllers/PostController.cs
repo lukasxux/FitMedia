@@ -8,6 +8,7 @@ using FitMediaApp.Application.Dto;
 using FitMediaApp.Application.Infastrucure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System.Linq;
 
 namespace FitMediaApp.Webapi.Controllers
 {
@@ -16,7 +17,7 @@ namespace FitMediaApp.Webapi.Controllers
         private readonly PostRepository _repo;
         private readonly FitMediaContext _db;
         private readonly IConfiguration _config;
-
+        
         public PostController(IMapper mapper, PostRepository repo, FitMediaContext db, IConfiguration config) : base(repo.Set, repo.Model, mapper)
         {
             _repo = repo;
@@ -38,22 +39,48 @@ namespace FitMediaApp.Webapi.Controllers
             return NoContent();
         }
 
-        [HttpPost("uploadPost")]
-        public async Task<IActionResult> uploadPost([FromBody] PostUploadDto newPost)
+        [HttpPost("like/{guid}")]
+        public async Task<IActionResult> LikePost(Guid guid)
         {
-            var post = _mapper.Map<Post>(newPost);
-            try
+            var authenticated = HttpContext.User.Identity?.IsAuthenticated ?? false;
+            if (!authenticated) { return Unauthorized(); }
+            var mail = HttpContext.User.Identity?.Name;
+            if (mail is null) { return Unauthorized(); }
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Mail == mail);
+            if (user is null) { return Unauthorized(); }
+            var post = await _db.Posts.Include(a => a.Likes).FirstOrDefaultAsync(u => u.Guid == guid);
+            if (post is null) { return BadRequest("Post gibt es nícht"); }
+            if (post.Likes.Contains(user))
             {
-                await _db.Posts.AddAsync(post);
+                post.Likes.Remove(user);
+                try { await _db.SaveChangesAsync(); } catch (DbUpdateException e) { return BadRequest(e.Message); }
+                return Ok(post.Likes.Count);
+            }
+            else {
+                post.Likes.Add(user);
                 await _db.SaveChangesAsync();
+                return Ok(post.Likes.Count());
             }
-            catch (DbUpdateException e)
-            {
-                return BadRequest(e.Message);
-            }
-            return Ok("User added successfully. Guid: " + post.Guid);
+            
         }
 
+        [HttpPost("comment")]
+        public async Task<IActionResult> CommentPost(CommentDto comment)
+        {
+            var authenticated = HttpContext.User.Identity?.IsAuthenticated ?? false;
+            if (!authenticated) { return Unauthorized(); }
+            var mail = HttpContext.User.Identity?.Name;
+            if (mail is null) { return Unauthorized(); }
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Mail == mail);
+            if (user is null) { return Unauthorized(); }
+            var post = await _db.Posts.Include(a => a.Likes).FirstOrDefaultAsync(u => u.Guid == comment.guid);
+            if (post is null) { return BadRequest("Post gibt es nícht"); }
+            var com = new Comment(user, comment.Text, comment.Date);
+            _db.Comments.Add(com);
+            post.Comments.Add(com);
+            await _db.SaveChangesAsync();
+            return Ok(post.Comments.Count());
 
+        }
     }
 }

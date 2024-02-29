@@ -6,8 +6,5 @@ using System.Threading.Tasks;
 
 namespace FitMediaApp.Application.Dto
 {
-    public record PostUploadDto(
-        string FilePathPic,
-        string Description
-        );
+
 }

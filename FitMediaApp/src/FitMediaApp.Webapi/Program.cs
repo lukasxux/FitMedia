@@ -9,6 +9,8 @@ using FitMediaApp.Application.Infastrucure.Repositories;
 using System;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 // See appsettings.json for configuration.
@@ -30,17 +32,22 @@ if (builder.Environment.IsDevelopment())
         options.AddDefaultPolicy(builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 }
 
-byte[] secret = Convert.FromBase64String(builder.Configuration["Secret"]);
-builder.Services
-    .AddAuthentication(options => options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.OnAppendCookie = cookieContext =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
+        cookieContext.CookieOptions.Secure = true;
+        cookieContext.CookieOptions.SameSite = builder.Environment.IsDevelopment() ? SameSiteMode.None : SameSiteMode.Strict;
+    };
+});
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(o =>
+    {
+        o.Events.OnRedirectToLogin = context =>
         {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(secret),
-            ValidateAudience = false,
-            ValidateIssuer = false
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return System.Threading.Tasks.Task.CompletedTask;
         };
     });
 
@@ -71,6 +78,7 @@ if (app.Environment.IsDevelopment())
 
 // Liefert die statischen Dateien, die von VueJS generiert werden, aus.
 app.UseStaticFiles();
+app.UseCookiePolicy();
 // Ab hier werden alle calls bearbeitet, die an die api gehen.
 app.UseAuthentication();
 app.UseAuthorization();
