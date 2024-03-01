@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 // See appsettings.json for configuration.
@@ -78,6 +80,12 @@ if (app.Environment.IsDevelopment())
 
 // Liefert die statischen Dateien, die von VueJS generiert werden, aus.
 app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+           Path.Combine(builder.Environment.ContentRootPath, "uploads")),
+    RequestPath = "/uploads"
+});
 app.UseCookiePolicy();
 // Ab hier werden alle calls bearbeitet, die an die api gehen.
 app.UseAuthentication();
