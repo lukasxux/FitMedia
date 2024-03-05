@@ -26,8 +26,8 @@ namespace FitMediaApp.Webapi.Controllers
             _db = db;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> UploadFile([FromForm] UploadFileCmd cmd)
+        [HttpPost("profilePicture")]
+        public async Task<IActionResult> UploadFileProfilePicture([FromForm] UploadFileCmd cmd)
         {
             if (cmd.File is null) return BadRequest("Missing file.");
             if (cmd.File.Length > 1024 * 1024) return BadRequest("Invalid filesize.");
