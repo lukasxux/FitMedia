@@ -17,4 +17,3 @@ namespace FitMediaApp.Application.Dto
         List<UserDto> Likes
     );
 }
-

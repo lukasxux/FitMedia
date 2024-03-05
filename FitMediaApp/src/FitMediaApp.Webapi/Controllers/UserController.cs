@@ -48,6 +48,7 @@ namespace FitMediaApp.Webapi.Controllers
             u.Mail,
             u.Username,
             u.Bio,
+            u.ProfilePicPath,
             FollowerCount = u.Followers.ToArray().Length,
             FollowingCount = u.Following.ToArray().Length,
             PostCount = u.Posts.ToArray().Length,
