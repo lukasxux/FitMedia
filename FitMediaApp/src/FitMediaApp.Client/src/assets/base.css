@@ -1,15 +1,12 @@
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
-  margin: 0;
   position: relative;
-  font-weight: normal;
 }
 
 body {
   min-height: 100vh;
-  color: var(--color-text);
+  color: white;
   background: rgb(13, 12, 18);
   transition: color 0.5s, background-color 0.5s;
   line-height: 1.6;
