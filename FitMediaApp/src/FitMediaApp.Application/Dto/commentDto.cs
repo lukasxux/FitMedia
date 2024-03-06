@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 namespace FitMediaApp.Application.Dto
 {
         public record CommentDto(
-               Guid Guid,
-               int UserId,
+               Guid guid,
                string Text,
                DateTime Date
            );

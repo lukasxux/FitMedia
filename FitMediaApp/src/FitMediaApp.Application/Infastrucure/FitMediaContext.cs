@@ -18,36 +18,22 @@ namespace FitMediaApp.Application.Infastrucure
         public FitMediaContext(DbContextOptions opt) : base(opt)
         {
         }
-
+        public DbSet<Follower> Followers => Set<Follower>();
         public DbSet<Comment> Comments => Set<Comment>();
         public DbSet<User> Users => Set<User>();
         public DbSet<Post> Posts => Set<Post>();
-        
+
         //OnModelCreate
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-            {
-                // Generic config for all entities
-                // ON DELETE RESTRICT instead of ON DELETE CASCADE
-                foreach (var key in entityType.GetForeignKeys())
-                    key.DeleteBehavior = DeleteBehavior.Restrict;
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.Posts)
+                .WithOne(p => p.User)
+                .OnDelete(DeleteBehavior.Restrict);
 
-                foreach (var prop in entityType.GetDeclaredProperties())
-                {
-                    // Define Guid as alternate key. The database can create a guid fou you.
-                    if (prop.Name == "Guid")
-                    {
-                        modelBuilder.Entity(entityType.ClrType).HasAlternateKey("Guid");
-                        prop.ValueGenerated = Microsoft.EntityFrameworkCore.Metadata.ValueGenerated.OnAdd;
-                    }
-                    // Default MaxLength of string Properties is 255.
-                    if (prop.ClrType == typeof(string) && prop.GetMaxLength() is null) prop.SetMaxLength(255);
-                    // Seconds with 3 fractional digits.
-                    if (prop.ClrType == typeof(DateTime)) prop.SetPrecision(3);
-                    if (prop.ClrType == typeof(DateTime?)) prop.SetPrecision(3);
-                }
-            }
+            modelBuilder.Entity<Follower>().HasOne(e => e.Following).WithMany(u => u.Following).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Follower>().HasOne(e => e.Follows).WithMany(u => u.Followers).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<User>().HasMany(e => e.Likes).WithMany(u => u.Likes);
         }
 
         //Seed 
@@ -73,11 +59,12 @@ namespace FitMediaApp.Application.Infastrucure
 
             var posts = new Faker<Post>("de").CustomInstantiator(f =>
             {
-                return new Post(
-                    user: f.PickRandom(users),
-                    date: f.Date.Past(),
-                    filePathPic: "Path/To/Your/Picture",
-                    description: f.Lorem.Sentence());
+            return new Post(
+                user: f.PickRandom(users),
+                date: f.Date.Past(),
+                filePathPic: "Path/To/Your/Picture",
+                description: f.Lorem.Sentence())
+                    { Guid = f.Random.Guid() };
             })
             .Generate(10)
             .ToList();
@@ -91,9 +78,10 @@ namespace FitMediaApp.Application.Infastrucure
                     return new Comment(
                         user: faker.PickRandom(users),
                         text: f.Lorem.Sentence(),
-                        date: f.Date.Past());
+                        date: f.Date.Past())
+                    { Guid = f.Random.Guid() };
                 })
-                .Generate(5) // Generate 5 comments for each post
+                .Generate(5) 
                 .ToList();
 
                 post.Comments.AddRange(comments);
