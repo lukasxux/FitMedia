@@ -27,7 +27,7 @@
     </div>
     <div>
       <div>
-        <h1><span style="color: rgb(74, 113, 165);">Beiträge</span> Erstellen</h1>
+        <h1><span style="color: rgb(74, 113, 165);">Beitrag</span> Erstellen</h1>
         <p>Mit unserer <span style="color: rgb(74, 113, 165);">intuitiven Beitragserstellung</span> kannst du deine <span style="color: rgb(74, 113, 165);">Gedanken</span>, <span style="color: rgb(74, 113, 165);">Erlebnisse</span> und <span style="color: rgb(74, 113, 165);">Ideen</span> in kürzester Zeit mit der <span style="color: rgb(74, 113, 165);">Welt</span> teilen. Wir glauben daran, dass jeder <span style="color: rgb(74, 113, 165);">Beitrag</span> einzigartig ist und eine eigene <span style="color: rgb(74, 113, 165);">Geschichte</span> erzählt</p>
       </div>
       <br>
