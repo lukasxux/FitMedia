@@ -13,14 +13,27 @@ namespace FitMediaApp.Application.Infastrucure.Repositories
         public UserRepository(FitMediaContext db) : base(db)
         {
         }
-
-        public override async Task<(bool success, string message)> Delete(Guid guid)
+           public override async Task<(bool success, string message)> Delete(Guid guid)
         {
-            var entity = await _db.Users.Include(h => h.Posts).FirstOrDefaultAsync(h => h.Guid == guid);
-            if (entity is null) { return (false, "User not found"); }
-            return await base.Delete(guid);
+            var user = await _db.Users.Include(u => u.Posts).FirstOrDefaultAsync(u => u.Guid == guid);
+            if (user == null)
+            {
+                return (false, "User not found");
+            }
+
+            foreach (var post in user.Posts)
+            {
+                _db.Comments.RemoveRange(post.Comments);
+            }
+
+            _db.Users.Remove(user);
+            await _db.SaveChangesAsync();
+
+            return (true, "User and associated posts deleted successfully");
         }
-        public override async Task<(bool success, string message)> Delete(int id)
+
+    
+    public override async Task<(bool success, string message)> Delete(int id)
         {
             var entity = _db.Users.Include(h => h.Posts).FirstOrDefault(h => h.Id == id);
             if (entity is null) { return (false, "User not found"); }

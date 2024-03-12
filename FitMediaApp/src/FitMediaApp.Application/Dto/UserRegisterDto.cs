@@ -13,6 +13,6 @@ namespace FitMediaApp.Application.Dto
     string Mail,
     string ProfilePicPath,
     String? Bio,
-    string initialPassword
+    string initialPasswords
     );
 }
