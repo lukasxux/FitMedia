@@ -18,4 +18,8 @@
     <ProjectReference Include="..\FitMediaApp.Application\FitMediaApp.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="uploads\" />
+  </ItemGroup>
+
 </Project>

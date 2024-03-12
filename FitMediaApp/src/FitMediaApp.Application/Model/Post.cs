@@ -39,6 +39,7 @@ namespace FitMediaApp.Application.Model
         public string FilePathPic { get; set; }
         public string Description { get; set; }
         public List<Comment> Comments { get; } = new();
+        public List<User> Likes { get; } = new();
 
     }
 }
