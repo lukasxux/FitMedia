@@ -24,61 +24,73 @@
         <H2>Username</H2>
         <img src="@/assets/Test-Bild.png" alt="" width="300">
         <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
+        <div>
+          <input type="text"> 
+          <button><i class="bi bi-send-fill"></i></button>
+        </div>
       </div>
       <div class="grid-item">
         <H2>Username</H2>
         <img src="@/assets/Test-Bild.png" alt="" width="300">
         <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
+        <div>
+          <input type="text"> 
+          <button><i class="bi bi-send-fill"></i></button>
+        </div>
       </div>
       <div class="grid-item">
         <H2>Username</H2>
         <img src="@/assets/Test-Bild.png" alt="" width="300">
         <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
+        <div>
+          <input type="text"> 
+          <button><i class="bi bi-send-fill"></i></button>
+        </div>
       </div>  
       <div class="grid-item">
         <H2>Username</H2>
         <img src="@/assets/Test-Bild.png" alt="" width="300">
         <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
+        <div>
+          <input type="text"> 
+          <button><i class="bi bi-send-fill"></i></button>
+        </div>
       </div>
       <div class="grid-item">
         <H2>Username</H2>
         <img src="@/assets/Test-Bild.png" alt="" width="300">
         <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
+        <div>
+          <input type="text"> 
+          <button><i class="bi bi-send-fill"></i></button>
+        </div>
       </div>
       <div class="grid-item">
         <H2>Username</H2>
         <img src="@/assets/Test-Bild.png" alt="" width="300">
         <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
+        <div>
+          <input type="text"> 
+          <button><i class="bi bi-send-fill"></i></button>
+        </div>
       </div>  
       <div class="grid-item">
         <H2>Username</H2>
         <img src="@/assets/Test-Bild.png" alt="" width="300">
         <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
+        <div>
+          <input type="text"> 
+          <button><i class="bi bi-send-fill"></i></button>
+        </div>
       </div>
       <div class="grid-item">
         <H2>Username</H2>
         <img src="@/assets/Test-Bild.png" alt="" width="300">
         <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
-      </div>
-      <div class="grid-item">
-        <H2>Username</H2>
-        <img src="@/assets/Test-Bild.png" alt="" width="300">
-        <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
-      </div> 
-      <div class="grid-item">
-        <H2>Username</H2>
-        <img src="@/assets/Test-Bild.png" alt="" width="300">
-        <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
-      </div>
-      <div class="grid-item">
-        <H2>Username</H2>
-        <img src="@/assets/Test-Bild.png" alt="" width="300">
-        <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
-      </div>
-      <div class="grid-item">
-        <H2>Username</H2>
-        <img src="@/assets/Test-Bild.png" alt="" width="300">
-        <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
+        <div>
+          <input type="text"> 
+          <button><i class="bi bi-send-fill"></i></button>
+        </div>
       </div>
     </div>
   </div>
@@ -157,5 +169,23 @@ h1{
   overflow: auto;
   height: 100px;
   width: 300px;
+}
+
+input{
+  width: 237.5px;
+  height: 10px;
+  border-radius: 5px;
+  border: 1px solid;
+}
+
+button{
+  padding-top: 10px;
+  margin-left: 10px;  
+  width: 30px;
+  height: 30px;
+  background-color: rgb(74, 113, 165);
+  border-radius: 5px;
+  border: 1px solid rgb(74, 113, 165);
+  transition: transform 80ms ease-in;
 }
 </style>

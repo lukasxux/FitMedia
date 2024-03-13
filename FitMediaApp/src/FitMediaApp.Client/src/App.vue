@@ -30,10 +30,6 @@ import { RouterLink, RouterView } from 'vue-router'
           </ul>
         </div>
       </nav>
-  <div>
-    <input type="file" @change="handleFileUpload">
-    <button @click="saveImageLocally">Bild lokal speichern</button>
-  </div>
     </div>
 
   <RouterView />
