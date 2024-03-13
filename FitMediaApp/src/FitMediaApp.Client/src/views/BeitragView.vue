@@ -9,6 +9,7 @@
           <h2 class="Bild">Fügen Sie ein Bild hinzu</h2>
         </div>
         <div>
+          <input type="file" @change="handleFileUpload">
           <img src="@/assets/Upload.png" alt="" width="300" length="300">
         </div>
         <br>
@@ -19,7 +20,7 @@
           <textarea id="text" name="text" cols="35" rows="5"></textarea>
         </div>
         <div>
-          <button class="button-1">Beitrag veröffentlichen</button> 
+          <button class="button-1" @click="saveImageLocally">Beitrag veröffentlichen</button> 
           <button class="button-2">Beitrag verwerfen</button>
         </div>
         <br>
