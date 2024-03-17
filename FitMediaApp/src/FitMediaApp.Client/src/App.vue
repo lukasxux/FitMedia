@@ -5,24 +5,18 @@ import HelloWorld from "./components/HelloWorld.vue";
 
 <template>
   <header>
-    <img alt="FitMedia logo" class="logo" src="@/assets/Fit-Media_logo.png" width="300" height="100" />
+    <!-- <img alt="FitMedia logo" class="logo" src="@/assets/Fit-Media_logo.png" width="300" height="100"/> -->
 
     <div class="wrapper">
       <!-- <HelloWorld msg="You dont have an account yet!" /> -->
       <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/login">Login</RouterLink>
+        <!--<RouterLink to="/">Home</RouterLink>
+        <RouterLink to="/login">Login</RouterLink> -->
       </nav>
-
-
-  <div>
-    <input type="file" @change="handleFileUpload">
-    <button @click="saveImageLocally">Bild lokal speichern</button>
-  </div>
     </div>
   </header>
 
-  <RouterView />
+  <RouterView/>
 </template>
 <style scoped>
 </style>
