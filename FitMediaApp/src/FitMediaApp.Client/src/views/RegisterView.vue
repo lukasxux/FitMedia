@@ -20,7 +20,7 @@
         </div>
         <button>Registrieren</button>
         <h3>Du hast <span class="highlight">bereits</span> einen Account?</h3>
-        <button id="signUp">Einloggen</button>
+        <button id="signUp" @click="redirectToLogin">Einloggen</button>
       </div>
     </div>
     <div>
@@ -134,6 +134,10 @@ input {
   margin-right: auto;
 }
 
+button:hover {
+  cursor: pointer; /* Ändere den Mauszeiger auf Zeiger, wenn über dem Button */
+}
+
 button {
   width: 110px;
   height: 50px;
@@ -197,4 +201,10 @@ function previewImage(event) {
   imagePreview.appendChild(img);
   showPreviewText.value = true; // Setze die Variable, um den Text anzuzeigen
 }
+
+function redirectToLogin() {
+    // Weiterleitung zur Registrierungsseite
+    window.location.href = "/login";
+    }
+
 </script>
