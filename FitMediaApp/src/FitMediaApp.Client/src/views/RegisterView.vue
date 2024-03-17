@@ -4,21 +4,21 @@
       <div class="container" id="container">
         <h1 id="create-account">Account erstellen</h1>
         <div class="input-container">
-          <input type="text" placeholder="Benutzername" />
+          <input type="text" placeholder="Benutzername" v-model="username" />
         </div>
         <div class="input-container">
-          <input type="email" placeholder="E-Mail" />
+          <input type="email" placeholder="E-Mail" v-model="email" />
         </div>
         <div class="input-container">
-          <input type="password" placeholder="Passwort" />
+          <input type="password" placeholder="Passwort" v-model="password" />
         </div>
         <div class="input-container">
           <input type="file" id="profile-image" name="profile-image" accept="image/png, image/jpeg" @change="previewImage($event)">
         </div>
         <div class="input-container">
-          <input type="text" placeholder="Steckbrief" style="height: 50px;"/>
+          <input type="text" placeholder="Steckbrief" style="height: 50px;" v-model="bio" />
         </div>
-        <button>Registrieren</button>
+        <button @click="registerUser">Registrieren</button>
         <h3>Du hast <span class="highlight">bereits</span> einen Account?</h3>
         <button id="signUp" @click="redirectToLogin">Einloggen</button>
       </div>
@@ -59,12 +59,82 @@
   </div>
 
   <div id="image-preview-container">
-    <h1 v-if="showPreviewText" >Ausgewähltes Bild</h1>
+    <h1 v-if="showPreviewText">Ausgewähltes Bild</h1>
     <div class="image-preview" id="image-preview"></div>
   </div>
 </template>
 
+<script setup>
+import { ref } from 'vue';
+import axios from 'axios';
+
+const showPreviewText = ref(false);
+const username = ref('');
+const email = ref('');
+const password = ref('');
+const bio = ref('');
+
+function previewImage(event) {
+  console.log("Bild ausgewählt");
+  const file = event.target.files[0];
+  const url = URL.createObjectURL(file);
+  const img = document.createElement('img');
+  img.src = url;
+  img.style.width = '200px'; // Vorschau-Größe anpassen
+
+  // Vorheriges Bildvorschau-Element leeren
+  const imagePreview = document.getElementById('image-preview');
+  while (imagePreview.firstChild) {
+    imagePreview.removeChild(imagePreview.lastChild);
+  }
+
+  // Neues Bildvorschau-Element hinzufügen
+  imagePreview.appendChild(img);
+  showPreviewText.value = true; // Setze die Variable, um den Text anzuzeigen
+}
+
+function redirectToLogin() {
+  // Weiterleitung zur Registrierungsseite
+  window.location.href = "/login";
+}
+</script>
+
+<script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      model: {
+        email: "",
+        password: "",
+        username: "",
+        bio: "",
+      }
+    };
+  },
+  methods: {
+    async registerUser() {
+      try {
+        const response = await axios.post("https://localhost:7001/api/User/register", {
+          username: this.username,
+          mail: this.email,
+          profilePicPath: "path/to/image",
+          initialPasswords: this.password,
+          bio: this.bio
+        });
+        alert("Registration successful!");
+      } catch (error) {
+        console.error(error);
+        alert("Registration failed.");
+      }
+    },
+  }
+}
+</script>
+
 <style scoped>
+/* CSS-Stile hier einfügen */
 .highlight {
   color: rgb(74, 113, 165);
   font-size: 18px;
@@ -177,34 +247,3 @@ p {
   width: 500px;
 }
 </style>
-
-<script setup>
-import { ref } from 'vue';
-
-const showPreviewText = ref(false);
-
-function previewImage(event) {
-  console.log("Bild ausgewählt");
-  const file = event.target.files[0];
-  const url = URL.createObjectURL(file);
-  const img = document.createElement('img');
-  img.src = url;
-  img.style.width = '200px'; // Vorschau-Größe anpassen
-
-  // Vorheriges Bildvorschau-Element leeren
-  const imagePreview = document.getElementById('image-preview');
-  while (imagePreview.firstChild) {
-    imagePreview.removeChild(imagePreview.lastChild);
-  }
-
-  // Neues Bildvorschau-Element hinzufügen
-  imagePreview.appendChild(img);
-  showPreviewText.value = true; // Setze die Variable, um den Text anzuzeigen
-}
-
-function redirectToLogin() {
-    // Weiterleitung zur Registrierungsseite
-    window.location.href = "/login";
-    }
-
-</script>

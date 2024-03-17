@@ -4,7 +4,7 @@
         <div class="container" id="container">
           <h1 id="create-account">Einloggen</h1>
           <div class="input-container">
-            <input type="text" placeholder="Benutzername / E-Mail" />
+            <input type="text" placeholder="E-Mail" />
           </div>
           <div class="input-container">
             <input type="password" placeholder="Passwort" />
@@ -169,4 +169,3 @@ button:hover {
     }
 
   </script>
-  
