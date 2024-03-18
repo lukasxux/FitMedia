@@ -3,27 +3,28 @@
 
 <template>
   <div class="grid-container">
-    <div class="border" id="border">
-      <div class="container" id="container">
+    <div class="border">
+      <div class="container">
         <div>
           <h2 class="Bild">Fügen Sie ein Bild hinzu</h2>
         </div>
         <div>
           <input type="file" @change="handleFileUpload">
-          <img src="@/assets/Upload.png" alt="" width="300" length="300">
+          <img id="image-preview" alt="" width="300" length="300">
         </div>
         <br>
         <div>
           <h2 class="text-fügen">Fügen Sie einen Text hinzu</h2>
         </div>
         <div>
-          <textarea id="text" name="text" cols="35" rows="5"></textarea>
+          <textarea v-model="post.description" cols="35" rows="5"></textarea>
         </div>
         <div>
-          <button class="button-1" @click="saveImageLocally">Beitrag veröffentlichen</button> 
+          <button class="button-1" @click="savePost">Beitrag veröffentlichen</button> 
           <button class="button-2">Beitrag verwerfen</button>
         </div>
         <br>
+        <div v-if="uploadError" class="error">{{ uploadError }}</div>
       </div>
     </div>
     <div>
@@ -105,3 +106,63 @@ p{
   width: 500px;
 }
 </style>
+
+<script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      post: {
+        description: "",
+        file: null
+      },
+      uploadError: null
+    };
+  },
+  methods: {
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      const url = URL.createObjectURL(file);
+      const img = document.getElementById('image-preview');
+      img.src = url;
+      this.post.file = file;
+    },
+    async savePost() {
+      try {
+        if (!this.post.description || !this.post.file) {
+          this.uploadError = "Bitte füllen Sie alle Felder aus.";
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('Description', this.post.description);
+        formData.append('File', this.post.file);
+        console.log(this.post.file);
+
+        const uploadPostPath = 'https://localhost:7001/api/Post/uploadPost';
+
+        axios.defaults.withCredentials = true;
+        await axios.post(uploadPostPath, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        
+        console.log('Beitrag erfolgreich erstellt');
+        // Reset der Eingaben nach erfolgreichem Speichern
+        this.resetForm();
+      } catch (error) {
+        console.error('Fehler beim Erstellen des Beitrags:', error);
+        this.uploadError = "Fehler beim Hochladen des Beitrags. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.";
+      }
+    },
+    resetForm() {
+      // Zurücksetzen der Eingabefelder
+      this.post.description = "";
+      this.post.file = null;
+      document.getElementById('image-preview').src = ""; // Leere das Vorschaubild
+    }
+  }
+}
+</script>
