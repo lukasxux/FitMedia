@@ -6,4 +6,5 @@
 **/.db*
 **/.user.json
 oploads/
+wwwroot/
 .vs/
