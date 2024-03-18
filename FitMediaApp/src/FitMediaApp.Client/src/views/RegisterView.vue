@@ -4,19 +4,19 @@
       <div class="container" id="container">
         <h1 id="create-account">Account erstellen</h1>
         <div class="input-container">
-          <input type="text" placeholder="Benutzername" v-model="username" />
+          <input type="text" placeholder="Benutzername" v-model="model.username" />
         </div>
         <div class="input-container">
-          <input type="email" placeholder="E-Mail" v-model="email" />
+          <input type="email" placeholder="E-Mail" v-model="model.email" />
         </div>
         <div class="input-container">
-          <input type="password" placeholder="Passwort" v-model="password" />
+          <input type="password" placeholder="Passwort" v-model="model.password" />
         </div>
         <div class="input-container">
-          <input type="file" id="profile-image" name="profile-image" accept="image/png, image/jpeg" @change="previewImage($event)">
+          <input type="file" id="profile-image" name="profile-image" accept="image/png, image/jpeg" @change="handleFileUpload">
         </div>
         <div class="input-container">
-          <input type="text" placeholder="Steckbrief" style="height: 50px;" v-model="bio" />
+          <input type="text" placeholder="Steckbrief" style="height: 50px;" v-model="model.bio" />
         </div>
         <button @click="registerUser">Registrieren</button>
         <h3>Du hast <span class="highlight">bereits</span> einen Account?</h3>
@@ -64,71 +64,67 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
-import axios from 'axios';
-
-const showPreviewText = ref(false);
-const username = ref('');
-const email = ref('');
-const password = ref('');
-const bio = ref('');
-
-function previewImage(event) {
-  console.log("Bild ausgewählt");
-  const file = event.target.files[0];
-  const url = URL.createObjectURL(file);
-  const img = document.createElement('img');
-  img.src = url;
-  img.style.width = '200px'; // Vorschau-Größe anpassen
-
-  // Vorheriges Bildvorschau-Element leeren
-  const imagePreview = document.getElementById('image-preview');
-  while (imagePreview.firstChild) {
-    imagePreview.removeChild(imagePreview.lastChild);
-  }
-
-  // Neues Bildvorschau-Element hinzufügen
-  imagePreview.appendChild(img);
-  showPreviewText.value = true; // Setze die Variable, um den Text anzuzeigen
-}
-
-function redirectToLogin() {
-  // Weiterleitung zur Registrierungsseite
-  window.location.href = "/login";
-}
-</script>
-
 <script>
 import axios from 'axios';
 
 export default {
   data() {
     return {
+      showPreviewText: false,
       model: {
+        username: "",
         email: "",
         password: "",
-        username: "",
         bio: "",
+        profilePicPath: "", // Hier wird der Pfad des Profilbilds gespeichert
       }
     };
   },
   methods: {
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      const url = URL.createObjectURL(file);
+      const img = document.createElement('img');
+      img.src = url;
+      img.style.width = '200px';
+
+      const imagePreview = document.getElementById('image-preview');
+      while (imagePreview.firstChild) {
+        imagePreview.removeChild(imagePreview.lastChild);
+      }
+
+      imagePreview.appendChild(img);
+      this.showPreviewText = true;
+
+      // Pfad im Model speichern
+      this.model.profilePicPath = url; // Speichern Sie den URL-Pfad im model.profilePicPath
+    },
     async registerUser() {
       try {
-        const response = await axios.post("https://localhost:7001/api/User/register", {
-          username: this.username,
-          mail: this.email,
-          profilePicPath: "path/to/image",
-          initialPasswords: this.password,
-          bio: this.bio
+        const formData = new FormData();
+        formData.append('file', document.getElementById('profile-image').files[0]);
+
+        const response = await axios.post('https://localhost:7001/api/User/register', {
+          username: this.model.username,
+          mail: this.model.email,
+          profilePicPath: this.model.profilePicPath, // Verwenden Sie den gespeicherten Pfad
+          initialPassword: this.model.password,
+          bio: this.model.bio
         });
-        alert("Registration successful!");
+
+        const responseData = response.data;
+        const userGuid = responseData.substring(responseData.indexOf("Guid: ") + 6, responseData.length).trim();
+
+        sessionStorage.setItem('userGuid', userGuid);
+        this.$router.push({ name: 'profile' });
       } catch (error) {
         console.error(error);
         alert("Registration failed.");
       }
     },
+    redirectToLogin() {
+      window.location.href = "/login";
+    }
   }
 }
 </script>

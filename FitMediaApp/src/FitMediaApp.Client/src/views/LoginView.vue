@@ -4,12 +4,12 @@
         <div class="container" id="container">
           <h1 id="create-account">Einloggen</h1>
           <div class="input-container">
-            <input type="text" placeholder="E-Mail" />
+            <input type="text" placeholder="E-Mail" v-model="email" />
           </div>
           <div class="input-container">
-            <input type="password" placeholder="Passwort" />
+            <input type="password" placeholder="Passwort" v-model="password" />
           </div>
-          <button>Einloggen</button>
+          <button @click="login">Einloggen</button>
           <h3>Du hast <span class="highlight">noch keinen</span>  Account?</h3>
           <button id="signUp" @click="redirectToRegister">Registrieren</button>
         </div>
@@ -40,11 +40,81 @@
       </div>
     </div>
   
-    <div id="image-preview-container">
-      <h1 v-if="showPreviewText" >Ausgewähltes Bild</h1>
-      <div class="image-preview" id="image-preview"></div>
-    </div>
   </template>
+  
+  <script setup>
+  import { ref } from 'vue';
+  import axios from 'axios';
+  
+  const email = ref('');
+  const password = ref('');
+  
+  function redirectToRegister() {
+    // Weiterleitung zur Registrierungsseite
+    window.location.href = "/register";
+  }
+  
+  async function login() {
+  console.log("Login with email:", email.value, "and password:", password.value);
+  try {
+    // Senden der Anmeldeinformationen an den Server
+    const response = await axios.post("https://localhost:7001/api/User/login", {
+      email: email.value,
+      password: password.value
+    });
+
+    // Überprüfen, ob die Anmeldeinformationen korrekt waren
+    if (response.status === 200) {
+      // Benutzerdaten abrufen, um die GUID zu erhalten
+      const userGuid = await getUserGuidByEmail(email.value);
+
+      // Überprüfen, ob die GUID gültig ist
+      if (userGuid) {
+        // Speichern der Benutzer-GUID in der Session
+        sessionStorage.setItem('userGuid', userGuid);
+
+        // Weiterleitung zur Profilseite
+        window.location.href = "/profile";
+      } else {
+        console.error("User GUID not found for email:", email.value);
+        alert("Login failed. Please check your credentials.");
+      }
+    } else {
+      console.error("Login request failed with status:", response.status);
+      alert("Login failed. Please try again later.");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Login failed.");
+  }
+}
+
+async function getUserGuidByEmail(email) {
+  try {
+    // Abrufen aller Benutzerdaten vom Server
+    const response = await axios.get("https://localhost:7001/api/User");
+
+    // Überprüfen, ob die Benutzerliste in der Antwort vorhanden ist
+    if (Array.isArray(response.data)) {
+      // Durchsuchen der Benutzerliste, um die GUID des Benutzers mit der angegebenen E-Mail-Adresse zu finden
+      for (const user of response.data) {
+        if (user.mail === email) {
+          return user.guid;
+        }
+      }
+      // Wenn die E-Mail-Adresse nicht gefunden wurde
+      console.error("User not found with email:", email);
+      return null;
+    } else {
+      console.error("Invalid response data:", response.data);
+      return null;
+    }
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+  </script>
   
   <style scoped>
 
@@ -160,12 +230,3 @@ button:hover {
     width: 500px;
   }
   </style>
-  
-  <script setup>
-  import { ref } from 'vue';
-    function redirectToRegister() {
-    // Weiterleitung zur Registrierungsseite
-    window.location.href = "/register";
-    }
-
-  </script>

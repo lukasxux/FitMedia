@@ -13,11 +13,13 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
+      meta: { requiresAuth: true }
     },
     {
       path: '/create-post',
       name: 'Beitrag erstellen',
       component: BeitragView,
+      meta: { requiresAuth: true }
     },
     {
       path: '/register',
@@ -28,6 +30,7 @@ const router = createRouter({
       path: '/search',
       name: 'Suchen',
       component: SuchView,
+      meta: { requiresAuth: true }
     },
     {
       path: '/login',
@@ -38,8 +41,20 @@ const router = createRouter({
       path: '/profile',
       name: 'profile',
       component: ProfileView,
+      meta: { requiresAuth: true }
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const hasGuid = sessionStorage.getItem('userGuid');
+
+  if (requiresAuth && !hasGuid) {
+    next('/login'); // Leite den Benutzer zur Login-Seite weiter, wenn Authentifizierung erforderlich ist, aber keine GUID vorhanden ist
+  } else {
+    next(); // Fortsetzen zur gewünschten Seite
+  }
+});
 
 export default router
