@@ -76,7 +76,7 @@ export default {
         email: "",
         password: "",
         bio: "",
-        profilePicPath: "", // Hier wird der Pfad des Profilbilds gespeichert
+        profilePicPath: null, // Hier wird das Bildobjekt gespeichert
       }
     };
   },
@@ -96,26 +96,43 @@ export default {
       imagePreview.appendChild(img);
       this.showPreviewText = true;
 
-      // Pfad im Model speichern
-      this.model.profilePicPath = url; // Speichern Sie den URL-Pfad im model.profilePicPath
+      // Bildobjekt im Model speichern
+      this.model.profilePicPath = file;
+    },
+    async uploadProfilePicture(userGuid) {
+      try {
+        const formData = new FormData();
+        formData.append('file', this.model.profilePicPath),
+        formData.append('userguid', userGuid);
+
+        // Profilbild mit der GUID hochladen
+        await axios.post(`https://localhost:7001/api/File/profilePicture`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+      } catch (error) {
+        console.error(error);
+        alert("Failed to upload profile picture.");
+      }
     },
     async registerUser() {
       try {
-        const formData = new FormData();
-        formData.append('file', document.getElementById('profile-image').files[0]);
-
         const response = await axios.post('https://localhost:7001/api/User/register', {
           username: this.model.username,
           mail: this.model.email,
-          profilePicPath: this.model.profilePicPath, // Verwenden Sie den gespeicherten Pfad
           initialPassword: this.model.password,
-          bio: this.model.bio
+          bio: this.model.bio,
+          profilePicPath: "../assets/Test-Bild.jpg"
         });
 
         const responseData = response.data;
         const userGuid = responseData.substring(responseData.indexOf("Guid: ") + 6, responseData.length).trim();
-
         sessionStorage.setItem('userGuid', userGuid);
+
+        // Profilbild hochladen, wenn die Registrierung erfolgreich war
+        await this.uploadProfilePicture(userGuid);
+
         this.$router.push({ name: 'profile' });
       } catch (error) {
         console.error(error);
