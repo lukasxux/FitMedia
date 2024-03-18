@@ -87,6 +87,7 @@ export default {
       const img = document.createElement('img');
       img.src = url;
       img.style.width = '200px';
+      console.log(file)
 
       const imagePreview = document.getElementById('image-preview');
       while (imagePreview.firstChild) {
@@ -133,6 +134,8 @@ export default {
         // Profilbild hochladen, wenn die Registrierung erfolgreich war
         await this.uploadProfilePicture(userGuid);
 
+        await this.loginUser(this.model.email, this.model.password);
+
         this.$router.push({ name: 'profile' });
       } catch (error) {
         console.error(error);
@@ -141,7 +144,18 @@ export default {
     },
     redirectToLogin() {
       window.location.href = "/login";
-    }
+    },
+    async loginUser(email, password) {
+  try {
+    const response = await axios.post('https://localhost:7001/api/User/login', {
+      email: email,
+      password: password
+    });
+  } catch (error) {
+    console.error(error);
+    alert("Login failed.");
+  }
+}   
   }
 }
 </script>
