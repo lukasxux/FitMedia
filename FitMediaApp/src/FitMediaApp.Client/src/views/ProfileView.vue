@@ -1,83 +1,124 @@
 <template>
-    <div class="profile">
-      <div class="profile-info">
-        <div class="profile-picture">
-            <img :src="pic" alt="Profilbild">
-        </div>
-        <div class="profile-details">
-          <h1>{{ username }}</h1>
-          <p>{{ bio }}</p>
-          <button @click="logout" class="logout-btn">Abmelden</button>
-        </div>
+  <div class="profile">
+    <div class="profile-info">
+      <div class="profile-picture">
+        <img :src="pic" alt="Profilbild">
+      </div>
+      <div class="profile-details">
+        <h1>{{ username }}</h1>
+        <p>{{ bio }}</p>
+        <button @click="logout" class="logout-btn">Abmelden</button>
+        <button @click="deleteAccount" class="delete-account-btn">Account löschen</button>
       </div>
     </div>
-    <div class="posts">
-      <div class="post-card" v-for="(post, index) in dummyPosts" :key="index">
-        <div class="post">
-          <div class="post-options">
-            <button @click="toggleOptions(index)" class="options-btn">...</button>
-            <div v-if="showOptions[index]" class="options-menu">
-              <button @click="deletePost(index)" class="delete-btn">Löschen</button>
-            </div>
+  </div>
+  <div class="posts" v-if="posts.length > 0">
+    <div class="post-card" v-for="(post, index) in posts" :key="index">
+      <div class="post">
+        <div class="post-options">
+          <button @click="toggleOptions(index)" class="options-btn">...</button>
+          <div v-if="showOptions[index]" class="options-menu">
+            <button @click="deletePost(index)" class="delete-btn">Löschen</button>
           </div>
-          <img :src="post.image" alt="Post Image" class="post-image"> <!-- Größe des Bildes angepasst -->
-          <p>{{ post.description }}</p>
         </div>
+        <img :src="post.image" alt="Post Image" class="post-image">
+        <p>{{ post.description }}</p>
       </div>
     </div>
-  </template>
-  
-  <script setup>
-  import { ref, onMounted } from 'vue';
-  import axios from 'axios';
-  
-  const username = ref('');
-  const bio = ref('');
-  const pic = ref("src/assets/Test-Bild.png");
-  const dummyPosts = ref([
-    { id: 1, image: 'https://via.placeholder.com/400x400', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-    { id: 2, image: 'https://via.placeholder.com/400x400', description: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' },
-    { id: 3, image: 'https://via.placeholder.com/400x400', description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco labo' },
-    { id: 4, image: 'https://via.placeholder.com/400x400', description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco labo' },
-    { id: 5, image: 'https://via.placeholder.com/400x400', description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco labo' },
-    { id: 6, image: 'https://via.placeholder.com/400x400', description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco labo' }
-  ]);
-  
-  const showOptions = ref(Array(dummyPosts.value.length).fill(false));
-  
-  function toggleOptions(index) {
-    showOptions.value[index] = !showOptions.value[index];
-  }
-  
-  function deletePost(index) {
-    dummyPosts.value.splice(index, 1);
-    showOptions.value[index] = false;
-  }
-  
-  async function fetchUserData() {
-    try {
-      const guid = sessionStorage.getItem('userGuid'); // Lade die GUID aus dem Session Storage
-      const response = await axios.get(`https://localhost:7001/api/user/${guid}`); // Sende eine Anfrage, um Benutzerdaten abzurufen
-      username.value = response.data.username;
-      bio.value = response.data.bio;
-      pic.value = "https://localhost:7001/" + response.data.profilePicPath;
-      console.log(response.data.profilePicPath);
-    } catch (error) {
-      console.error(error);
-      // Hier kannst du eine Fehlerbehandlung hinzufügen, falls der Abruf fehlschlägt
-    }
-  }
+  </div>
+  <div v-else class="no-posts">
+    <p>Keine Posts vorhanden.</p>
+  </div>
+</template>
 
-  function logout() {
-  sessionStorage.removeItem('userGuid'); // Lösche die GUID aus dem Session Storage
-    window.location.href = '/login';
+<script setup>
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+
+const username = ref('');
+const bio = ref('');
+const pic = ref("src/assets/Test-Bild.png");
+const posts = ref([]);
+const showOptions = ref([]);
+
+async function toggleOptions(index) {
+  showOptions.value[index] = !showOptions.value[index];
 }
-  
-  onMounted(fetchUserData); // Rufe die Funktion fetchUserData beim Laden der Komponente auf
-  </script>
+
+async function deletePost(index) {
+  try {
+    const postGuid = posts.value[index].guid;
+    await axios.delete(`https://localhost:7001/api/Post/${postGuid}`);
+    posts.value.splice(index, 1);
+    showOptions.value[index] = false;
+  } catch (error) {
+    console.error("Fehler beim Löschen des Beitrags:", error);
+  }
+}
+
+async function deleteAccount() {
+  try {
+    await axios.delete(`https://localhost:7001/api/User`);
+    sessionStorage.removeItem('userGuid');
+    window.location.href = '/register';
+  } catch (error) {
+    console.error("Fehler beim Löschen des Accounts:", error);
+  }
+}
+
+async function fetchUserData() {
+  try {
+    const guid = sessionStorage.getItem('userGuid');
+    const response = await axios.get(`https://localhost:7001/api/user/${guid}`);
+    username.value = response.data.username;
+    bio.value = response.data.bio;
+    pic.value = "https://localhost:7001/" + response.data.profilePicPath;
+    
+    if (response.data.posts.length > 0) {
+      posts.value = response.data.posts;
+      showOptions.value = Array(response.data.posts.length).fill(false);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+function logout() {
+  sessionStorage.removeItem('userGuid');
+  window.location.href = '/login';
+}
+
+onMounted(fetchUserData);
+</script>
   
   <style scoped>
   /* Stil für die Profilanzeige */
+
+  .delete-account-btn {
+  background-color: #ff6347;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
+.delete-account-btn:hover {
+  background-color: #d9534f;
+}
+
+  .no-posts {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px; /* Du kannst die Höhe anpassen, um die Position der Nachricht zu ändern */
+  font-size: 24px; /* Größe der Nachricht anpassen */
+}
+
   .profile {
     max-width: 800px;
     margin: 20px auto;
