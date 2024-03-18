@@ -7,7 +7,7 @@
       <h1><span style="color: rgb(74, 113, 165);">Fit-</span>Media</h1>
     </div>
     <div>
-      <h2 id="short-text">Willkommen zurück <Span style="color: rgb(74, 113, 165);">Username</Span>!</h2>
+      <h2 id="short-text">Willkommen zurück <Span style="color: rgb(74, 113, 165);">{{ username }}</Span>!</h2>
       <h3 id="short-text">Hier sind die <Span style="color: rgb(74, 113, 165);">neuesten Beiträge</Span>, von denen die dir <Span style="color: rgb(74, 113, 165);">wichtig</Span> sind.</h3>
     </div>
     <div class="grid-container">
@@ -168,3 +168,23 @@ button{
   margin-right: 12px;
 }
 </style>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+
+const username = ref('');
+
+async function fetchUserData() {
+  try {
+    const guid = sessionStorage.getItem('userGuid');
+    const response = await axios.get(`https://localhost:7001/api/user/${guid}`);
+    console.log("API response:", response.data);
+    username.value = response.data.username;
+  } catch (error) {
+    console.error(error);
+    // Hier kannst du eine Fehlerbehandlung hinzufügen, falls der Abruf fehlschlägt
+  }
+}
+onMounted(fetchUserData);
+</script>
