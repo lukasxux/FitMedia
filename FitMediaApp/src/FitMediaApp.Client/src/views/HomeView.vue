@@ -12,60 +12,88 @@
     </div>
     <div class="grid-container">
         <div class="grid-item">
-        <H2>Username</H2>
-        <img src="@/assets/Test-Bild.png" alt="" width="300">
-        <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
-      </div>
+          <H2>Username</H2>
+          <img src="@/assets/Test-Bild.png" alt="" width="300">
+          <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
+          <div>
+            <input type="text"> 
+            <button><i class="bi bi-send-fill"></i></button>
+          </div>
+        </div>
         <div class="grid-item">
-            <div class="grid-item">
-        <H2>Username</H2>
-        <img src="@/assets/Test-Bild.png" alt="" width="300">
-        <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
-      </div>
+          <div class="grid-item">
+            <H2>Username</H2>
+            <img src="@/assets/Test-Bild.png" alt="" width="300">
+            <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
+            <div>
+              <input type="text"> 
+              <button><i class="bi bi-send-fill"></i></button>
+            </div>
+          </div>
         </div>
         <div class="item2">
-            <div>
-                <img src="@/assets/profile-picture.png" alt="" width="150">
-                <h3>Username</h3>
-            </div>
-            <div>
-                <img src="@/assets/profile-picture.png" alt="" width="150">
-                <h3>Username</h3>
-            </div>
-            <div>
-                <img src="@/assets/profile-picture.png" alt="" width="150">
-                <h3>Username</h3>
-            </div>
-            <div>
-                <img src="@/assets/profile-picture.png" alt="" width="150">
-                <h3>Username</h3>
-            </div>
-            <div>
-                <img src="@/assets/profile-picture.png" alt="" width="150">
-                <h3>Username</h3>
-            </div>
-            <div>
-                <img src="@/assets/profile-picture.png" alt="" width="150">
-                <h3>Username</h3>
-            </div>
-            <div>
-                <img src="@/assets/profile-picture.png" alt="" width="150">
-                <h3>Username</h3>
-            </div>
+          <div>
+            <h3>Username</h3>
+            <img src="@/assets/profile-picture.png" alt="" width="150">
+            <button id="folgen">Profil Folgen</button>
+          </div>
+          <div>
+            <h3>Username</h3>
+            <img src="@/assets/profile-picture.png" alt="" width="150">
+            <button id="folgen">Profil Folgen</button>
+          </div>
+          <div>
+            <h3>Username</h3>
+            <img src="@/assets/profile-picture.png" alt="" width="150">
+            <button id="folgen">Profil Folgen</button>
+          </div>
+          <div>
+            <h3>Username</h3>
+            <img src="@/assets/profile-picture.png" alt="" width="150">
+            <button id="folgen">Profil Folgen</button>
+          </div>
+          <div>
+            <h3>Username</h3>
+            <img src="@/assets/profile-picture.png" alt="" width="150">
+            <button id="folgen">Profil Folgen</button>
+          </div>
+          <div>
+            <h3>Username</h3>
+            <img src="@/assets/profile-picture.png" alt="" width="150">
+            <button id="folgen">Profil Folgen</button>
+          </div>
+          <div>
+            <h3>Username</h3>
+            <img src="@/assets/profile-picture.png" alt="" width="150">
+            <button id="folgen">Profil Folgen</button>
+          </div>
+          <div>
+            <h3>Username</h3>
+            <img src="@/assets/profile-picture.png" alt="" width="150">
+            <button id="folgen">Profil Folgen</button>
+          </div>
         </div>
         <div class="grid-item">
-            <div class="grid-item">
-        <H2>Username</H2>
-        <img src="@/assets/Test-Bild.png" alt="" width="300">
-        <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
-      </div>
+          <div class="grid-item">
+            <H2>Username</H2>
+            <img src="@/assets/Test-Bild.png" alt="" width="300">
+            <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
+            <div>
+              <input type="text"> 
+              <button><i class="bi bi-send-fill"></i></button>
+            </div>
+          </div>
         </div>  
         <div class="grid-item">
-            <div class="grid-item">
-        <H2>Username</H2>
-        <img src="@/assets/Test-Bild.png" alt="" width="300">
-        <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
-      </div>
+          <div class="grid-item">
+            <H2>Username</H2>
+            <img src="@/assets/Test-Bild.png" alt="" width="300">
+            <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
+            <div>
+               <input type="text"> 
+              <button><i class="bi bi-send-fill"></i></button>
+            </div>
+          </div>
         </div>
     </div>
   </div>
@@ -76,6 +104,7 @@
   display: grid;
   gap: 10px;
   margin-left: 10%;
+  padding-bottom: 20px;
 }
 
 .item2 {
@@ -95,10 +124,6 @@
   width: 300px;
 }
 
-h3{
-  padding-bottom: 30px;
-}
-
 h1{
   text-align: center;
 }
@@ -110,4 +135,36 @@ h1{
   padding-bottom: 20px;
 }
 
+input{
+  width: 237.5px;
+  height: 27px;
+  border-radius: 5px;
+  border: 1px solid;
+}
+
+button{
+  padding-top: 10px;
+  margin-left: 10px;  
+  width: 30px;
+  height: 30px;
+  background-color: rgb(74, 113, 165);
+  border-radius: 5px;
+  border: 1px solid rgb(74, 113, 165);
+  transition: transform 80ms ease-in;
+}
+
+#folgen{
+  background-color: rgb(74, 113, 165);
+  border-radius: 5px;
+  border: 1px solid rgb(74, 113, 165);
+  width: 120px;
+  height: 20px;
+  color: rgb(255, 255, 255);
+  font-size: 12px;
+  font-weight: bold;
+  transition: transform 80ms ease-in;
+  padding-bottom: 25px;
+  margin-top: 10px;
+  margin-right: 12px;
+}
 </style>
