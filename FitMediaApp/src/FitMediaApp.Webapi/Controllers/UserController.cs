@@ -49,10 +49,11 @@ namespace FitMediaApp.Webapi.Controllers
             u.Username,
             u.Bio,
             u.ProfilePicPath,
-            FollowerCount = u.Followers.ToArray().Length,
-            FollowingCount = u.Following.ToArray().Length,
-            PostCount = u.Posts.ToArray().Length,
+            u.Followers,
+            u.Following,
+            u.Posts,
         });
+
 
         [Authorize]
         [HttpDelete()]
@@ -85,6 +86,7 @@ namespace FitMediaApp.Webapi.Controllers
         public async Task<IActionResult> Register([FromBody] UserRegisterDto newUser)
         {
             var user = _mapper.Map<User>(newUser);
+            user.Guid = Guid.NewGuid();
             try
             {
                 await _db.Users.AddAsync(user);
