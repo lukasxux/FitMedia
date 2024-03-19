@@ -32,7 +32,7 @@ import { RouterLink, RouterView } from 'vue-router'
       </nav>
     </div>
 
-  <RouterView />
+  <RouterView/>
 </template>
 
 <style scoped>

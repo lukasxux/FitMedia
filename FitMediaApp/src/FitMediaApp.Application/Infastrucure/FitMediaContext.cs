@@ -48,7 +48,7 @@ namespace FitMediaApp.Application.Infastrucure
                     mail: f.Name.FirstName() + "@gmail.com",
                     username: f.Name.FirstName(),
                     initialPassword: "1111",
-                    profilePicPath: "ProfilPic/1",
+                    profilePicPath: "uploads/090d347a36664385835d379c8d367e00.png",
                     bio: "This is a Bio")
                 { Guid = f.Random.Guid() };
             })

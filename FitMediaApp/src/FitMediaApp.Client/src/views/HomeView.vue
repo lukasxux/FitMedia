@@ -145,6 +145,7 @@ const commentText = ref('');
 const newComment = ref('');
 const users = ref([]);
 
+
 async function fetchUserData() {
   try {
     const guid = sessionStorage.getItem('userGuid');
@@ -156,6 +157,7 @@ async function fetchUserData() {
     // Hier kannst du eine Fehlerbehandlung hinzufügen, falls der Abruf fehlschlägt
   }
 }
+
 async function fetchAllUserData() {
   try {
     const response = await axios.get('https://localhost:7001/api/User');
@@ -177,6 +179,7 @@ async function followUser(username) {
     // Hier kannst du eine Fehlerbehandlung hinzufügen, falls das Folgen fehlschlägt
   }
 }
+
 
 async function addComment() {
   try {
