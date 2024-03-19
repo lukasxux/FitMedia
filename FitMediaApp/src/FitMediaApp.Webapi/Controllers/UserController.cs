@@ -49,11 +49,10 @@ namespace FitMediaApp.Webapi.Controllers
             u.Username,
             u.Bio,
             u.ProfilePicPath,
-            u.Followers,
-            u.Following,
+            u.FollowerSender,
+            u.FollowerRecipient,
             u.Posts,
         });
-
 
         [Authorize]
         [HttpDelete()]
@@ -137,19 +136,19 @@ namespace FitMediaApp.Webapi.Controllers
             if (userSender is null) { return Unauthorized(); }
             var userRecipient = await _db.Users.FirstOrDefaultAsync(a => a.Username == username);
             if (userRecipient is null) { return BadRequest(); }
-            var follow = await _db.Followers.FirstOrDefaultAsync(a => a.Follows == userSender && a.Following == userRecipient);
+            var follow = await _db.Followers.FirstOrDefaultAsync(a => a.Sender == userSender && a.Recipient == userRecipient);
             if (follow is not null)
             {
                 _db.Followers.Remove(follow);
                 try { await _db.SaveChangesAsync(); }
                 catch (DbUpdateException e) { return BadRequest(e.Message); }
-                return Ok(_db.Followers.Where(a => a.Following.Guid == userRecipient.Guid).Count());
+                return Ok(_db.Followers.Where(a => a.Recipient.Guid == userRecipient.Guid).Count());
             }
-            var follower = new Follower(userSender, userRecipient);
+            var follower = new Follower(userSender, userRecipient, DateTime.UtcNow.Date);
             _db.Followers.Add(follower);
             try { await _db.SaveChangesAsync(); }
             catch (DbUpdateException e) { return BadRequest(e.Message); }
-            return Ok(_db.Followers.Where(a => a.Following.Guid == userRecipient.Guid).Count());
+            return Ok(_db.Followers.Where(a => a.Recipient.Guid == userRecipient.Guid).Count());
         }
 
     }

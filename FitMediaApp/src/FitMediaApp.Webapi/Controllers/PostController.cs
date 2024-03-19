@@ -70,7 +70,7 @@ namespace FitMediaApp.Webapi.Controllers
         }
 
         [HttpPost("comment")]
-        public async Task<IActionResult> CommentPost(CommentDto comment)
+        public async Task<IActionResult> CommentPost(commentDtoUpload comment)
         {
             var authenticated = HttpContext.User.Identity?.IsAuthenticated ?? false;
             if (!authenticated) { return Unauthorized(); }
@@ -78,14 +78,14 @@ namespace FitMediaApp.Webapi.Controllers
             if (mail is null) { return Unauthorized(); }
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Mail == mail);
             if (user is null) { return Unauthorized(); }
-            var post = await _db.Posts.Include(a => a.Likes).FirstOrDefaultAsync(u => u.Guid == comment.guid);
+            var post = await _db.Posts.Include(e => e.User).Include(a => a.Likes).FirstOrDefaultAsync(u => u.Guid == comment.guid);
             if (post is null) { return BadRequest("Post gibt es nícht"); }
             var com = new Comment(user, comment.Text, comment.Date);
+            com.Guid = Guid.NewGuid();
             _db.Comments.Add(com);
             post.Comments.Add(com);
             await _db.SaveChangesAsync();
-            return Ok(post.Comments.Count());
-
+            return Ok(post.User.Username);
         }
 
         [HttpPost("uploadPost")]

@@ -1,26 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace FitMediaApp.Application.Model
 {
-    public class Follower
+    public class Follower : IEntity<int>
     {
-#pragma warning disable CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Erwägen Sie die Deklaration als Nullable.
-        protected Follower() { }
-#pragma warning restore CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Erwägen Sie die Deklaration als Nullable.
-
-        public Follower(User follower, User following)
+        public Follower(User sender, User recipient, DateTime dateTime)
         {
-            Follows = follower;
-            Following = following;
+            Sender = sender;
+            Recipient = recipient;
+            DateTime = dateTime;
         }
 
-        public int id { get; set; }
-        public Guid guid { get; set; }
-        public User Follows { get; set; }
-        public User Following { get; set; }
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        protected Follower() { }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+        public Guid Guid { get; set; }
+        public User Sender { get; set; }
+        public User Recipient { get; set; }
+        public DateTime DateTime { get; set; }
     }
 }

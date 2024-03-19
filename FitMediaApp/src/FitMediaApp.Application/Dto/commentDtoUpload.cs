@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace FitMediaApp.Application.Dto
 {
-        public record CommentDto(
-               UserDtoForComment User,
+    public record commentDtoUpload(
+               Guid guid,
                string Text,
                DateTime Date
-           );
+        );
 }
