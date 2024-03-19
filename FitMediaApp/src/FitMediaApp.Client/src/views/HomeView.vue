@@ -7,18 +7,19 @@
       <h1><span style="color: rgb(74, 113, 165);">Fit-</span>Media</h1>
     </div>
     <div>
-      <h2 id="short-text">Willkommen zurück <Span style="color: rgb(74, 113, 165);">Username</Span>!</h2>
+      <h2 id="short-text">Willkommen zurück <Span style="color: rgb(74, 113, 165);">{{ username }}</Span>!</h2>
       <h3 id="short-text">Hier sind die <Span style="color: rgb(74, 113, 165);">neuesten Beiträge</Span>, von denen die dir <Span style="color: rgb(74, 113, 165);">wichtig</Span> sind.</h3>
     </div>
     <div class="grid-container">
         <div class="grid-item">
-          <H2>Username</H2>
+          <H2>Luca</H2>
           <img src="@/assets/Test-Bild.png" alt="" width="300">
           <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
           <div>
-            <input type="text"> 
-            <button><i class="bi bi-send-fill"></i></button>
+            <input type="text" v-model="commentText"> 
+            <button @click="addComment"><i class="bi bi-send-fill"></i></button>
           </div>
+          <p id="kommentar">{{ newComment }}</p>
         </div>
         <div class="grid-item">
           <div class="grid-item">
@@ -32,45 +33,10 @@
           </div>
         </div>
         <div class="item2">
-          <div>
-            <h3>Username</h3>
-            <img src="@/assets/profile-picture.png" alt="" width="150">
-            <button id="folgen">Profil Folgen</button>
-          </div>
-          <div>
-            <h3>Username</h3>
-            <img src="@/assets/profile-picture.png" alt="" width="150">
-            <button id="folgen">Profil Folgen</button>
-          </div>
-          <div>
-            <h3>Username</h3>
-            <img src="@/assets/profile-picture.png" alt="" width="150">
-            <button id="folgen">Profil Folgen</button>
-          </div>
-          <div>
-            <h3>Username</h3>
-            <img src="@/assets/profile-picture.png" alt="" width="150">
-            <button id="folgen">Profil Folgen</button>
-          </div>
-          <div>
-            <h3>Username</h3>
-            <img src="@/assets/profile-picture.png" alt="" width="150">
-            <button id="folgen">Profil Folgen</button>
-          </div>
-          <div>
-            <h3>Username</h3>
-            <img src="@/assets/profile-picture.png" alt="" width="150">
-            <button id="folgen">Profil Folgen</button>
-          </div>
-          <div>
-            <h3>Username</h3>
-            <img src="@/assets/profile-picture.png" alt="" width="150">
-            <button id="folgen">Profil Folgen</button>
-          </div>
-          <div>
-            <h3>Username</h3>
-            <img src="@/assets/profile-picture.png" alt="" width="150">
-            <button id="folgen">Profil Folgen</button>
+          <div v-for="user in users" :key="user.guid">
+            <h3>{{ user.username }}</h3>
+            <img :src="`https://localhost:7001/${user.profilePicPath}`" alt="" width="150">
+            <button id="folgen" @click="followUser(user.username)">Profil Folgen</button>
           </div>
         </div>
         <div class="grid-item">
@@ -166,5 +132,71 @@ button{
   padding-bottom: 25px;
   margin-top: 10px;
   margin-right: 12px;
+  margin-bottom: 20px;
 }
 </style>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+
+const username = ref('');
+const commentText = ref('');
+const newComment = ref('');
+const users = ref([]);
+
+async function fetchUserData() {
+  try {
+    const guid = sessionStorage.getItem('userGuid');
+    const response = await axios.get(`https://localhost:7001/api/user/${guid}`);
+    console.log("API response:", response.data);
+    username.value = response.data.username;
+  } catch (error) {
+    console.error(error);
+    // Hier kannst du eine Fehlerbehandlung hinzufügen, falls der Abruf fehlschlägt
+  }
+}
+async function fetchAllUserData() {
+  try {
+    const response = await axios.get('https://localhost:7001/api/User');
+    console.log("API response:", response.data);
+    users.value = response.data; // Speichere die Benutzerdaten im Ref
+  } catch (error) {
+    console.error(error);
+    // Hier kannst du eine Fehlerbehandlung hinzufügen, falls der Abruf fehlschlägt
+  }
+}
+
+async function followUser(username) {
+  try {
+    const response = await axios.post(`https://localhost:7001/api/User/follow/${username}`);
+    console.log(`Du folgst jetzt ${username}. API response:`, response.data);
+    // Hier könntest du weitere Aktionen nach dem Folgen des Benutzers einfügen, wenn nötig
+  } catch (error) {
+    console.error(error);
+    // Hier kannst du eine Fehlerbehandlung hinzufügen, falls das Folgen fehlschlägt
+  }
+}
+
+async function addComment() {
+  try {
+    const guid = sessionStorage.getItem('userGuid');
+    console.log("Kommentar hinzufügen:", commentText.value, "für Benutzer mit GUID", guid, "Mit date", new Date().toISOString());
+    const commentData = {
+      guid: guid,
+      text: commentText.value,
+      date: new Date().toISOString()
+    };
+    const response = await axios.post('https://localhost:7001/api/Post/comment', commentData);
+    console.log("Kommentar hinzugefügt:", response.data);
+    newComment.value = response.data.text; // Neue Kommentarantwort im neuen Kommentar anzeigen
+    // Hier kannst du weitere Schritte nach dem Hinzufügen des Kommentars einfügen, z.B. das Laden der aktualisierten Daten
+  } catch (error) {
+    console.error("Fehler beim Hinzufügen des Kommentars:", error);
+    // Hier kannst du eine Fehlerbehandlung hinzufügen
+  }
+}
+
+onMounted(fetchAllUserData);
+onMounted(fetchUserData);
+</script>
