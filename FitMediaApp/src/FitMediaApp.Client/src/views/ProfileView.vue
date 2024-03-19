@@ -7,9 +7,9 @@
       <div class="profile-details">
         <h1>{{ username }}</h1>
         <div class="profile-stats">
-          <p>{{ followers.length }} Follower</p>
-          <p>{{ following.length }} Following</p>
-          <p>{{ posts.length }} Posts</p>
+          <p>{{ followers.length }} Follower </p>
+          <p class="following">{{ following.length }} Following</p>
+          <p class="following">{{ posts.length }} Posts</p>
         </div>
         <div v-html="formattedBio" class="formattedBio"></div>
         <button @click="logout" class="logout-btn">Abmelden</button>
@@ -18,7 +18,7 @@
     </div>
   </div>
   <div class="posts" v-if="posts.length > 0">
-    <div class="post-card" v-for="(post, index) in posts" :key="index">
+    <div class="post-card" v-for="(post, index) in posts" :key="index" @click="displayPostGuid(post.guid)">
       <div class="post">
         <div class="post-options">
           <button @click="toggleOptions(index)" class="options-btn">...</button>
@@ -28,6 +28,17 @@
         </div>
         <img :src="getPostImagePath(post.filePathPic)" alt="Post Image" class="post-image">
         <p>{{ post.description }}</p>
+        <div class="comment">
+          <div v-if="post.comments.length === 0" class="no-comments">
+  <p>Noch keine Kommentare</p>
+</div>
+<div v-else>
+  <div v-for="(comment, cIndex) in post.comments" :key="cIndex" class="comment">
+    <p>{{ comment.text }}</p>
+  </div>
+</div>
+
+        </div>
       </div>
     </div>
   </div>
@@ -82,9 +93,14 @@ async function fetchUserData() {
     pic.value = "https://localhost:7001/" + response.data.profilePicPath;
     
     if (response.data.posts.length > 0) {
+      for (const post of response.data.posts) {
+        const postResponse = await axios.get(`https://localhost:7001/api/Post/${post.guid}?$expand=comments`);
+        post.comments = postResponse.data.comments;
+      }
       posts.value = response.data.posts;
       showOptions.value = Array(response.data.posts.length).fill(false);
     }
+    
     followers.value = response.data.followers;
     following.value = response.data.following;
   } catch (error) {
@@ -110,10 +126,23 @@ onMounted(fetchUserData);
 const formattedBio = computed(() => {
   return bio.value.split('\n').map(line => `<p>${line}</p>`).join('');
 });
+
+// Methode zum Anzeigen der GUID des Posts
+function displayPostGuid(postGuid) {
+  console.log("GUID des Posts:", postGuid);
+}
 </script>
 
 <style scoped>
 /* Stil für die Profilanzeige */
+.comment {
+  padding: 5px; /* Reduziere den Innenabstand */
+  border-radius: 5px;
+  margin-bottom: 5px; /* Kleinerer Abstand zwischen den Kommentaren */
+  color: orange;
+  max-height: 100px; /* Begrenze die maximale Höhe des Kommentarbereichs */
+  overflow: hidden; /* Verhindere, dass der Kommentarbereich über die maximale Höhe hinausragt */
+}
 
 .delete-account-btn {
   background-color: #ff6347;
@@ -246,18 +275,32 @@ const formattedBio = computed(() => {
   border-radius: 8px; /* Abgerundete Ecken für das Bild */
 }
 
-p {
-  margin: 0; /* Verringert den Abstand zwischen den <p> Tags */
-  line-height: 1;
+
+.comment {
+  padding: 5px; /* Reduziere den Innenabstand */
+  border-radius: 5px;
+  margin-bottom: 5px; /* Kleinerer Abstand zwischen den Kommentaren */
+  color: orange;
+  max-height: 100px; /* Begrenze die maximale Höhe des Kommentarbereichs */
+  overflow: hidden; /* Verhindere, dass der Kommentarbereich über die maximale Höhe hinausragt */
 }
 
+.comment p {
+  margin: 0; /* Entferne den Standardabstand für <p>-Tags */
+}
+
+.no-comments {
+  text-align: center;
+  color: #999;
+}
 .profile-stats {
   display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
 }
 
-.profile-stats p {
-  color: #999;
+.profile-stats .stat {
+  margin-right: 20px; /* Abstand zwischen den Statistiken */
+}
+.profile-stats .following {
+  margin-left: 10px; /* Abstand vor dem Following-Text */
 }
 </style>
