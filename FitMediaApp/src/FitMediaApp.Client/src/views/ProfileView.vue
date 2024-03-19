@@ -6,7 +6,12 @@
       </div>
       <div class="profile-details">
         <h1>{{ username }}</h1>
-        <p>{{ bio }}</p>
+        <div class="profile-stats">
+          <p>{{ followers.length }} Follower</p>
+          <p>{{ following.length }} Following</p>
+          <p>{{ posts.length }} Posts</p>
+        </div>
+        <div v-html="formattedBio" class="formattedBio"></div>
         <button @click="logout" class="logout-btn">Abmelden</button>
         <button @click="deleteAccount" class="delete-account-btn">Account löschen</button>
       </div>
@@ -21,7 +26,7 @@
             <button @click="deletePost(index)" class="delete-btn">Löschen</button>
           </div>
         </div>
-        <img :src="post.image" alt="Post Image" class="post-image">
+        <img :src="getPostImagePath(post.filePathPic)" alt="Post Image" class="post-image">
         <p>{{ post.description }}</p>
       </div>
     </div>
@@ -32,13 +37,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 
 const username = ref('');
 const bio = ref('');
 const pic = ref("src/assets/Test-Bild.png");
 const posts = ref([]);
+const followers = ref([]);
+const following = ref([]);
 const showOptions = ref([]);
 
 async function toggleOptions(index) {
@@ -78,6 +85,8 @@ async function fetchUserData() {
       posts.value = response.data.posts;
       showOptions.value = Array(response.data.posts.length).fill(false);
     }
+    followers.value = response.data.followers;
+    following.value = response.data.following;
   } catch (error) {
     console.error(error);
   }
@@ -88,13 +97,25 @@ function logout() {
   window.location.href = '/login';
 }
 
-onMounted(fetchUserData);
-</script>
-  
-  <style scoped>
-  /* Stil für die Profilanzeige */
+function getPostImagePath(filePath) {
+  if (filePath === "Path/To/Your/Picture") {
+    return 'https://localhost:7001/uploads/57e80e77c688490895cf3d7a4fd8f44c.png';
+  } else {
+    return `https://localhost:7001/${filePath}`;
+  }
+}
 
-  .delete-account-btn {
+onMounted(fetchUserData);
+
+const formattedBio = computed(() => {
+  return bio.value.split('\n').map(line => `<p>${line}</p>`).join('');
+});
+</script>
+
+<style scoped>
+/* Stil für die Profilanzeige */
+
+.delete-account-btn {
   background-color: #ff6347;
   color: #fff;
   border: none;
@@ -111,7 +132,7 @@ onMounted(fetchUserData);
   background-color: #d9534f;
 }
 
-  .no-posts {
+.no-posts {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -119,17 +140,17 @@ onMounted(fetchUserData);
   font-size: 24px; /* Größe der Nachricht anpassen */
 }
 
-  .profile {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #1a1a1a;
-    color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-  }
+.profile {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #1a1a1a;
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
 
-  .logout-btn {
+.logout-btn {
   background-color: #ff6347; /* Hintergrundfarbe des Buttons */
   color: #fff; /* Textfarbe */
   border: none; /* Kein Rand */
@@ -143,86 +164,100 @@ onMounted(fetchUserData);
 .logout-btn:hover {
   background-color: #d9534f; /* Hintergrundfarbe ändert sich beim Mouseover */
 }
-  
-  .profile-info {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  .profile-picture img {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    overflow: hidden;
-  }
-  
-  .profile-details {
-    margin-left: 20px;
-  }
-  
-  .posts {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start; /* Vertikale Ausrichtung anpassen */
-    flex-wrap: wrap; /* Postkarten werden in der nächsten Zeile umbrochen */
-  }
-  
-  .post-card {
-    position: relative;
-    flex: 0 0 calc(33.33% - 20px); /* Jede Karte nimmt 1/3 des verfügbaren Raums ein (mit Abstand) */
-    margin: 10px; /* Abstand zwischen den Karten */
-  }
-  
-  .post {
-    position: relative;
-    background-color: #333;
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
-  }
-  
-  .post-options {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-  }
-  
-  .options-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 24px;
-  }
-  
-  .options-menu {
-    position: absolute;
-    top: 30px;
-    right: 0;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    display: none;
-  }
-  
-  .post-card:hover .options-menu {
-    display: block;
-  }
-  
-  .delete-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 5px 10px;
-    color: red;
-  }
-  
-  .post-image {
-    width: 50%; /* Bild wird auf 100% der Containerbreite skaliert */
-    height: auto; /* Höhe automatisch anpassen */
-    border-radius: 8px; /* Abgerundete Ecken für das Bild */
-  }
-  </style>
-  
+
+.profile-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.profile-picture img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.profile-details {
+  margin-left: 20px;
+}
+
+.posts {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Vertikale Ausrichtung anpassen */
+  flex-wrap: wrap; /* Postkarten werden in der nächsten Zeile umbrochen */
+}
+
+.post-card {
+  position: relative;
+  flex: 0 0 calc(33.33% - 20px); /* Jede Karte nimmt 1/3 des verfügbaren Raums ein (mit Abstand) */
+  margin: 10px; /* Abstand zwischen den Karten */
+}
+
+.post {
+  position: relative;
+  background-color: #333;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.post-options {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.options-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.options-menu {
+  position: absolute;
+  top: 30px;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: none;
+}
+
+.post-card:hover .options-menu {
+  display: block;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px 10px;
+  color: red;
+}
+
+.post-image {
+  width: 50%; /* Bild wird auf 100% der Containerbreite skaliert */
+  height: auto; /* Höhe automatisch anpassen */
+  border-radius: 8px; /* Abgerundete Ecken für das Bild */
+}
+
+p {
+  margin: 0; /* Verringert den Abstand zwischen den <p> Tags */
+  line-height: 1;
+}
+
+.profile-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.profile-stats p {
+  color: #999;
+}
+</style>

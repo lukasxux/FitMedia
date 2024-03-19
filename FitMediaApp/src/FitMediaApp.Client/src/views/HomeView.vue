@@ -12,13 +12,14 @@
     </div>
     <div class="grid-container">
         <div class="grid-item">
-          <H2>Username</H2>
+          <H2>Luca</H2>
           <img src="@/assets/Test-Bild.png" alt="" width="300">
           <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
           <div>
-            <input type="text"> 
-            <button><i class="bi bi-send-fill"></i></button>
+            <input type="text" v-model="commentText"> 
+            <button @click="addComment"><i class="bi bi-send-fill"></i></button>
           </div>
+          <p id="kommentar">{{ newComment }}</p>
         </div>
         <div class="grid-item">
           <div class="grid-item">
@@ -174,6 +175,8 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
 const username = ref('');
+const commentText = ref('');
+const newComment = ref('');
 
 async function fetchUserData() {
   try {
@@ -186,5 +189,25 @@ async function fetchUserData() {
     // Hier kannst du eine Fehlerbehandlung hinzufügen, falls der Abruf fehlschlägt
   }
 }
+
+async function addComment() {
+  try {
+    const guid = sessionStorage.getItem('userGuid');
+    console.log("Kommentar hinzufügen:", commentText.value, "für Benutzer mit GUID", guid, "Mit date", new Date().toISOString());
+    const commentData = {
+      guid: guid,
+      text: commentText.value,
+      date: new Date().toISOString()
+    };
+    const response = await axios.post('https://localhost:7001/api/Post/comment', commentData);
+    console.log("Kommentar hinzugefügt:", response.data);
+    newComment.value = response.data.text; // Neue Kommentarantwort im neuen Kommentar anzeigen
+    // Hier kannst du weitere Schritte nach dem Hinzufügen des Kommentars einfügen, z.B. das Laden der aktualisierten Daten
+  } catch (error) {
+    console.error("Fehler beim Hinzufügen des Kommentars:", error);
+    // Hier kannst du eine Fehlerbehandlung hinzufügen
+  }
+}
+
 onMounted(fetchUserData);
 </script>
