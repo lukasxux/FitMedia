@@ -16,7 +16,7 @@
           <input type="file" id="profile-image" name="profile-image" accept="image/png, image/jpeg" @change="handleFileUpload">
         </div>
         <div class="input-container">
-          <input type="text" placeholder="Steckbrief" style="height: 50px;" v-model="model.bio" />
+          <textarea type="text" placeholder="Steckbrief" style="height: 50px; width: 420px;" v-model="model.bio" rows="5" ></textarea>
         </div>
         <button @click="registerUser">Registrieren</button>
         <h3>Du hast <span class="highlight">bereits</span> einen Account?</h3>
