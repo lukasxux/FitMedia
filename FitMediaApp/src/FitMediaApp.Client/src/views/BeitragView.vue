@@ -21,7 +21,6 @@
         </div>
         <div>
           <button class="button-1" @click="savePost">Beitrag veröffentlichen</button> 
-          <button class="button-2">Beitrag verwerfen</button>
         </div>
         <br>
         <div v-if="uploadError" class="error">{{ uploadError }}</div>
@@ -67,6 +66,10 @@ padding: 67px;
 
 .container{
   margin-left: 19%;
+}
+
+button:hover {
+  cursor: pointer; /* Ändere den Mauszeiger auf Zeiger, wenn über dem Button */
 }
 
 button{
@@ -150,6 +153,7 @@ export default {
         });
         
         console.log('Beitrag erfolgreich erstellt');
+        window.location.href = "/profile";
         // Reset der Eingaben nach erfolgreichem Speichern
         this.resetForm();
       } catch (error) {
