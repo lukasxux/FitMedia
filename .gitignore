@@ -5,7 +5,6 @@
 **/node_modules
 **/.db*
 **/.user.json
-oploads/
 uploads/
 wwwroot/
 .vs/
