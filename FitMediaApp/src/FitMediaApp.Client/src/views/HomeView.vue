@@ -95,9 +95,7 @@ h1{
 }
 
 #short-text{
-  width: 400px;
   text-align: center;
-  margin-left: 37%;
   padding-bottom: 20px;
 }
 
@@ -169,19 +167,22 @@ async function fetchAllUserData() {
   }
 }
 
+// Funktion, um dem Benutzer zu folgen oder das Folgen aufzuheben
 async function followUser(username) {
   try {
     const response = await axios.post(`https://localhost:7001/api/User/follow/${username}`);
     console.log(`Du folgst jetzt ${username}. API response:`, response.data);
     const button = document.getElementById('folgen');
     if (button.textContent === 'Profil entfernen') {
-      button.textContent = 'Profil folgen'; // Ändere den Text des Buttons zurück
-      button.style.backgroundColor = 'rgb(74, 113, 165)'; // Setze die Hintergrundfarbe des Buttons zurück
-      button.style.borderColor = 'rgb(74, 113, 165)'; // Setze die Randfarbe des Buttons zurück
+      button.textContent = 'Profil folgen';
+      button.style.backgroundColor = 'rgb(74, 113, 165)';
+      button.style.borderColor = 'rgb(74, 113, 165)';
+      localStorage.setItem('isFollowing', 'false');
     } else {
-      button.textContent = 'Profil entfernen'; // Ändere den Text des Buttons
-      button.style.backgroundColor = 'red'; // Ändere die Hintergrundfarbe des Buttons
-      button.style.borderColor = 'red'; // Ändere die Randfarbe des Buttons
+      button.textContent = 'Profil entfernen';
+      button.style.backgroundColor = 'red';
+      button.style.borderColor = 'red';
+      localStorage.setItem('isFollowing', 'true');
     }
   } catch (error) {
     console.error(error);
@@ -189,6 +190,25 @@ async function followUser(username) {
   }
 }
 
+// Überprüfe den gespeicherten Zustand des Buttons beim Laden der Seite
+window.onload = function() {
+  const buttons = document.querySelectorAll('.folgen-button');
+  buttons.forEach(button => {
+    let isFollowing = localStorage.getItem(`isFollowing_${button.dataset.username}`);
+    if (isFollowing === 'true') {
+      button.textContent = 'Profil entfernen';
+      button.style.backgroundColor = 'red';
+      button.style.borderColor = 'red';
+    } else {
+      button.textContent = 'Profil folgen';
+      button.style.backgroundColor = 'rgb(74, 113, 165)';
+      button.style.borderColor = 'rgb(74, 113, 165)';
+    }
+
+    // Füge einen Event-Listener hinzu, um das Folgen zu ermöglichen
+    button.addEventListener('click', () => followUser(button.dataset.username));
+  });
+};
 
 async function addComment() {
   try {

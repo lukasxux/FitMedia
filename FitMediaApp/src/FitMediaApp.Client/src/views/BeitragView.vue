@@ -9,8 +9,12 @@
           <h2 class="Bild">Fügen Sie ein Bild hinzu</h2>
         </div>
         <div>
-          <input type="file" @change="handleFileUpload">
-          <img id="image-preview" alt="" width="300" length="300">
+          <label for="file-upload" class="custom-file-upload">
+            <input id="file-upload" type="file" @change="handleFileUpload">
+            Wählen Sie eine Datei aus
+          </label>
+          <img v-if="post.file" :src="post.imageUrl" alt="Bildvorschau" id="Upload" width="300" height="300">
+          <img v-else src="@/assets/Upload.png" alt="Platzhalterbild" id="Upload" width="300" height="300">
         </div>
         <br>
         <div>
@@ -73,13 +77,13 @@ button:hover {
 }
 
 button{
-  margin-left: 7%;
-  width: 110px;
-  height: 50px;
-  margin-top: 25px;
+  margin-left: 12%;
+  width: 200px;
+  height: 30px;
+  margin-top: 15px;
   background-color: rgb(74, 113, 165);
   color: rgb(255, 255, 255);
-  border-radius: 20px;
+  border-radius: 10px;
   border: 1px solid rgb(74, 113, 165);
   font-size: 12px;
   font-weight: bold;
@@ -91,6 +95,7 @@ button{
 }
 
 .text-fügen{
+  margin-top: 5px;
   margin-left: 2.3%;
 }
 
@@ -108,6 +113,26 @@ textarea{
 p{
   width: 500px;
 }
+
+.custom-file-upload {
+  margin-top: 10px;
+  margin-left: 15.5%;
+  background-color: rgb(74, 113, 165);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.custom-file-upload input[type="file"] {
+  display: none;
+}
+
+#Upload{
+  margin-top: 15px; 
+}
 </style>
 
 <script>
@@ -118,7 +143,8 @@ export default {
     return {
       post: {
         description: "",
-        file: null
+        file: null,
+        imageUrl: ""
       },
       uploadError: null
     };
@@ -127,8 +153,7 @@ export default {
     handleFileUpload(event) {
       const file = event.target.files[0];
       const url = URL.createObjectURL(file);
-      const img = document.getElementById('image-preview');
-      img.src = url;
+      this.post.imageUrl = url;
       this.post.file = file;
     },
     async savePost() {
@@ -165,7 +190,7 @@ export default {
       // Zurücksetzen der Eingabefelder
       this.post.description = "";
       this.post.file = null;
-      document.getElementById('image-preview').src = ""; // Leere das Vorschaubild
+      this.post.imageUrl = "";
     }
   }
 }
