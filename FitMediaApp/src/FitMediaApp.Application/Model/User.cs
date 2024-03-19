@@ -48,8 +48,8 @@ namespace FitMediaApp.Application.Model
         
         public List<Post> Posts { get; } = new List<Post>();
         public List<Post> Likes { get; } = new List<Post>();
-        public List<Follower> Followers { get; } = new();
-        public List<Follower> Following { get; } = new();
+        public List<Follower> FollowerSender { get; } = new();
+        public List<Follower> FollowerRecipient { get; } = new();
 
 
         /// <summary>

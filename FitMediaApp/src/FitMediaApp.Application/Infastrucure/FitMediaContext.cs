@@ -31,8 +31,9 @@ namespace FitMediaApp.Application.Infastrucure
                 .WithOne(p => p.User)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Follower>().HasOne(e => e.Following).WithMany(u => u.Following).OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<Follower>().HasOne(e => e.Follows).WithMany(u => u.Followers).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Follower>().HasOne(f => f.Sender).WithMany(u => u.FollowerSender).OnDelete(DeleteBehavior.Restrict); ;
+            modelBuilder.Entity<Follower>().HasOne(f => f.Recipient).WithMany(u => u.FollowerRecipient).OnDelete(DeleteBehavior.Restrict); ;
+
             modelBuilder.Entity<User>().HasMany(e => e.Likes).WithMany(u => u.Likes);
         }
 
