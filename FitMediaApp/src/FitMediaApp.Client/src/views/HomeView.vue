@@ -33,45 +33,10 @@
           </div>
         </div>
         <div class="item2">
-          <div>
-            <h3>Username</h3>
-            <img src="@/assets/profile-picture.png" alt="" width="150">
-            <button id="folgen">Profil Folgen</button>
-          </div>
-          <div>
-            <h3>Username</h3>
-            <img src="@/assets/profile-picture.png" alt="" width="150">
-            <button id="folgen">Profil Folgen</button>
-          </div>
-          <div>
-            <h3>Username</h3>
-            <img src="@/assets/profile-picture.png" alt="" width="150">
-            <button id="folgen">Profil Folgen</button>
-          </div>
-          <div>
-            <h3>Username</h3>
-            <img src="@/assets/profile-picture.png" alt="" width="150">
-            <button id="folgen">Profil Folgen</button>
-          </div>
-          <div>
-            <h3>Username</h3>
-            <img src="@/assets/profile-picture.png" alt="" width="150">
-            <button id="folgen">Profil Folgen</button>
-          </div>
-          <div>
-            <h3>Username</h3>
-            <img src="@/assets/profile-picture.png" alt="" width="150">
-            <button id="folgen">Profil Folgen</button>
-          </div>
-          <div>
-            <h3>Username</h3>
-            <img src="@/assets/profile-picture.png" alt="" width="150">
-            <button id="folgen">Profil Folgen</button>
-          </div>
-          <div>
-            <h3>Username</h3>
-            <img src="@/assets/profile-picture.png" alt="" width="150">
-            <button id="folgen">Profil Folgen</button>
+          <div v-for="user in users" :key="user.guid">
+            <h3>{{ user.username }}</h3>
+            <img :src="`https://localhost:7001/${user.profilePicPath}`" alt="" width="150">
+            <button id="folgen" @click="followUser(user.username)">Profil Folgen</button>
           </div>
         </div>
         <div class="grid-item">
@@ -167,6 +132,7 @@ button{
   padding-bottom: 25px;
   margin-top: 10px;
   margin-right: 12px;
+  margin-bottom: 20px;
 }
 </style>
 
@@ -177,6 +143,8 @@ import axios from 'axios';
 const username = ref('');
 const commentText = ref('');
 const newComment = ref('');
+const users = ref([]);
+
 
 async function fetchUserData() {
   try {
@@ -189,6 +157,29 @@ async function fetchUserData() {
     // Hier kannst du eine Fehlerbehandlung hinzufügen, falls der Abruf fehlschlägt
   }
 }
+
+async function fetchAllUserData() {
+  try {
+    const response = await axios.get('https://localhost:7001/api/User');
+    console.log("API response:", response.data);
+    users.value = response.data; // Speichere die Benutzerdaten im Ref
+  } catch (error) {
+    console.error(error);
+    // Hier kannst du eine Fehlerbehandlung hinzufügen, falls der Abruf fehlschlägt
+  }
+}
+
+async function followUser(username) {
+  try {
+    const response = await axios.post(`https://localhost:7001/api/User/follow/${username}`);
+    console.log(`Du folgst jetzt ${username}. API response:`, response.data);
+    // Hier könntest du weitere Aktionen nach dem Folgen des Benutzers einfügen, wenn nötig
+  } catch (error) {
+    console.error(error);
+    // Hier kannst du eine Fehlerbehandlung hinzufügen, falls das Folgen fehlschlägt
+  }
+}
+
 
 async function addComment() {
   try {
@@ -209,5 +200,6 @@ async function addComment() {
   }
 }
 
+onMounted(fetchAllUserData);
 onMounted(fetchUserData);
 </script>
