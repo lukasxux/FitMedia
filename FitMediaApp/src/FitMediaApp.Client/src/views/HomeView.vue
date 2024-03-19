@@ -173,7 +173,16 @@ async function followUser(username) {
   try {
     const response = await axios.post(`https://localhost:7001/api/User/follow/${username}`);
     console.log(`Du folgst jetzt ${username}. API response:`, response.data);
-    // Hier könntest du weitere Aktionen nach dem Folgen des Benutzers einfügen, wenn nötig
+    const button = document.getElementById('folgen');
+    if (button.textContent === 'Profil entfernen') {
+      button.textContent = 'Profil folgen'; // Ändere den Text des Buttons zurück
+      button.style.backgroundColor = 'rgb(74, 113, 165)'; // Setze die Hintergrundfarbe des Buttons zurück
+      button.style.borderColor = 'rgb(74, 113, 165)'; // Setze die Randfarbe des Buttons zurück
+    } else {
+      button.textContent = 'Profil entfernen'; // Ändere den Text des Buttons
+      button.style.backgroundColor = 'red'; // Ändere die Hintergrundfarbe des Buttons
+      button.style.borderColor = 'red'; // Ändere die Randfarbe des Buttons
+    }
   } catch (error) {
     console.error(error);
     // Hier kannst du eine Fehlerbehandlung hinzufügen, falls das Folgen fehlschlägt
