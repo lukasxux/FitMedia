@@ -122,8 +122,18 @@ export default {
         alert("Failed to upload profile picture.");
       }
     },
+    validateForm() {
+      if (!this.model.username || !this.model.email || !this.model.password || !this.model.bio || !this.model.profilePicPath) {
+        alert("Bitte füllen Sie alle Pflichtfelder aus.");
+        return false;
+      }
+      return true;
+    },
     async registerUser() {
       try {
+        if (!this.validateForm()) {
+          return;
+        }
         const response = await axios.post('https://localhost:7001/api/User/register', {
           username: this.model.username,
           mail: this.model.email,
