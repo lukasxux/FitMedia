@@ -101,8 +101,8 @@ async function fetchUserData() {
       showOptions.value = Array(response.data.posts.length).fill(false);
     }
     
-    followers.value = response.data.followers;
-    following.value = response.data.following;
+    followers.value = response.data.followerRecipient;
+    following.value = response.data.followerSender;
   } catch (error) {
     console.error(error);
   }
