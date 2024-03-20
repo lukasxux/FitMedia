@@ -49,8 +49,17 @@ namespace FitMediaApp.Webapi.Controllers
             u.Username,
             u.Bio,
             u.ProfilePicPath,
-            u.FollowerSender,
-            u.FollowerRecipient,
+            FollowerSender = u.FollowerSender.Select(a => new {
+                Recipient = new
+                {
+                    a.Recipient.Guid
+                }
+            }),
+            FollowerRecipient = u.FollowerRecipient.Select(a => new {
+                Sender = new {
+                a.Sender.Guid
+                }
+            }),
             u.Posts,
         });
 
@@ -148,9 +157,8 @@ namespace FitMediaApp.Webapi.Controllers
             _db.Followers.Add(follower);
             try { await _db.SaveChangesAsync(); }
             catch (DbUpdateException e) { return BadRequest(e.Message); }
-            return Ok(_db.Followers.Where(a => a.Recipient.Guid == userRecipient.Guid).Count());
+            return Ok(userSender.Username);
         }
-
     }
 }
 
