@@ -4,23 +4,28 @@
       <div class="container" id="container">
         <h1 id="create-account">Account erstellen</h1>
         <div class="input-container">
-          <input type="text" placeholder="Benutzername" v-model="model.username" />
+          <input type="text" placeholder="Benutzername" v-model="model.username" style="width: 379px;"/>
         </div>
         <div class="input-container">
-          <input type="email" placeholder="E-Mail" v-model="model.email" />
+          <input type="email" placeholder="E-Mail" v-model="model.email" style="width: 379px;"/>
         </div>
         <div class="input-container">
-          <input type="password" placeholder="Passwort" v-model="model.password" />
+          <input type="password" placeholder="Passwort" v-model="model.password" style="width: 379px;" />
         </div>
         <div class="input-container">
-          <input type="file" id="profile-image" name="profile-image" accept="image/png, image/jpeg" @change="handleFileUpload">
+          <textarea type="text" placeholder="Steckbrief" style="height: 50px; width: 398px; margin-top: 8px;" v-model="model.bio" rows="5" ></textarea>
         </div>
+        <br>
         <div class="input-container">
-          <textarea type="text" placeholder="Steckbrief" style="height: 50px; width: 420px;" v-model="model.bio" rows="5" ></textarea>
+          <label for="file-upload" class="custom-file-upload">
+            <input id="file-upload" type="file" @change="handleFileUpload">
+            Wählen Sie eine Datei aus
+          </label>
         </div>
-        <button @click="registerUser">Registrieren</button>
+        <br>
+        <button class="button1" @click="registerUser">Registrieren</button>
         <h3>Du hast <span class="highlight">bereits</span> einen Account?</h3>
-        <button id="signUp" @click="redirectToLogin">Einloggen</button>
+        <button class="button1" @click="redirectToLogin">Einloggen</button>
       </div>
     </div>
     <div>
@@ -124,7 +129,7 @@ export default {
           mail: this.model.email,
           initialPassword: this.model.password,
           bio: this.model.bio,
-          profilePicPath: "../assets/Test-Bild.jpg"
+          profilePicPath: "https://localhost:7001/uploads/57e80e77c688490895cf3d7a4fd8f44c.png"
         });
 
         const responseData = response.data;
@@ -161,6 +166,25 @@ export default {
 </script>
 
 <style scoped>
+.button1{
+  margin-left: 5%;
+}
+
+.custom-file-upload {
+  margin-top: 10px;
+  margin-left: 32%;
+  background-color: rgb(74, 113, 165);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.custom-file-upload input[type="file"] {
+  display: none;
+}
 /* CSS-Stile hier einfügen */
 .highlight {
   color: rgb(74, 113, 165);
