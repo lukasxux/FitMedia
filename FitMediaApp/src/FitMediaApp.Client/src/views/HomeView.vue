@@ -36,7 +36,9 @@
           <div v-for="user in users" :key="user.guid">
             <h3>{{ user.username }}</h3>
             <img :src="`https://localhost:7001/${user.profilePicPath}`" alt="" width="150">
-            <button id="folgen" @click="followUser(user.username)">Profil Folgen</button>
+            <button id="folgen" @click="toggleFollowStatus(user)" :style="{ backgroundColor: checkFollowStatus(user.username) ? 'red' : 'rgb(74, 113, 165)' }">
+              {{ checkFollowStatus(user.username) ? 'Profil entfernen' : 'Profil folgen' }}
+            </button>
           </div>
         </div>
         <div class="grid-item">
@@ -120,7 +122,7 @@ button{
 #folgen{
   background-color: rgb(74, 113, 165);
   border-radius: 5px;
-  border: 1px solid rgb(74, 113, 165);
+  border: 1px solid rgb(28, 29, 29);
   width: 120px;
   height: 20px;
   color: rgb(255, 255, 255);
@@ -143,92 +145,63 @@ const commentText = ref('');
 const newComment = ref('');
 const users = ref([]);
 
+// Funktion zur Prüfung und Wiederherstellung des Follow-Status aus dem localStorage
+function checkFollowStatus(username) {
+  const followStatus = localStorage.getItem(`followStatus_${username}`);
+  return followStatus === 'true'; // Gibt true zurück, wenn Benutzer gefolgt ist, sonst false
+}
+
+// Funktion zum Ändern des Follow-Status im localStorage und lokalen Zustand
+async function toggleFollowStatus(user) {
+  try {
+    const username = user.username;
+    const currentStatus = localStorage.getItem(`followStatus_${username}`);
+    const newStatus = currentStatus === 'true' ? 'false' : 'true';
+    localStorage.setItem(`followStatus_${username}`, newStatus);
+
+    // Lokalen Zustand aktualisieren
+    const updatedUsers = users.value.map(u => {
+      if (u.username === username) {
+        return { ...u, isFollowed: newStatus === 'true' };
+      }
+      return u;
+    });
+    users.value = updatedUsers;
+
+    // API-Aufruf zum Folgen/Entfolgen des Benutzers
+    const response = await axios.post(`https://localhost:7001/api/User/follow/${username}`);
+    console.log(`Du folgst jetzt ${username}. API response:`, response.data);
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 async function fetchUserData() {
   try {
     const guid = sessionStorage.getItem('userGuid');
     const response = await axios.get(`https://localhost:7001/api/user/${guid}`);
-    console.log("API response:", response.data);
     username.value = response.data.username;
   } catch (error) {
     console.error(error);
-    // Hier kannst du eine Fehlerbehandlung hinzufügen, falls der Abruf fehlschlägt
   }
 }
 
 async function fetchAllUserData() {
   try {
     const response = await axios.get('https://localhost:7001/api/User');
-    console.log("API response:", response.data);
-    users.value = response.data; // Speichere die Benutzerdaten im Ref
+    const userDataWithFollowStatus = response.data.map(user => ({
+      ...user,
+      isFollowed: checkFollowStatus(user.username)
+    }));
+    users.value = userDataWithFollowStatus;
   } catch (error) {
     console.error(error);
-    // Hier kannst du eine Fehlerbehandlung hinzufügen, falls der Abruf fehlschlägt
   }
 }
 
-// Funktion, um dem Benutzer zu folgen oder das Folgen aufzuheben
-async function followUser(username) {
-  try {
-    const response = await axios.post(`https://localhost:7001/api/User/follow/${username}`);
-    console.log(`Du folgst jetzt ${username}. API response:`, response.data);
-    const button = document.getElementById('folgen');
-    if (button.textContent === 'Profil entfernen') {
-      button.textContent = 'Profil folgen';
-      button.style.backgroundColor = 'rgb(74, 113, 165)';
-      button.style.borderColor = 'rgb(74, 113, 165)';
-      localStorage.setItem('isFollowing', 'false');
-    } else {
-      button.textContent = 'Profil entfernen';
-      button.style.backgroundColor = 'red';
-      button.style.borderColor = 'red';
-      localStorage.setItem('isFollowing', 'true');
-    }
-  } catch (error) {
-    console.error(error);
-    // Hier kannst du eine Fehlerbehandlung hinzufügen, falls das Folgen fehlschlägt
-  }
-}
+onMounted(() => {
+  fetchAllUserData();
+  fetchUserData();
+});
 
-// Überprüfe den gespeicherten Zustand des Buttons beim Laden der Seite
-window.onload = function() {
-  const buttons = document.querySelectorAll('.folgen-button');
-  buttons.forEach(button => {
-    let isFollowing = localStorage.getItem(`isFollowing_${button.dataset.username}`);
-    if (isFollowing === 'true') {
-      button.textContent = 'Profil entfernen';
-      button.style.backgroundColor = 'red';
-      button.style.borderColor = 'red';
-    } else {
-      button.textContent = 'Profil folgen';
-      button.style.backgroundColor = 'rgb(74, 113, 165)';
-      button.style.borderColor = 'rgb(74, 113, 165)';
-    }
-
-    // Füge einen Event-Listener hinzu, um das Folgen zu ermöglichen
-    button.addEventListener('click', () => followUser(button.dataset.username));
-  });
-};
-
-async function addComment() {
-  try {
-    const guid = sessionStorage.getItem('userGuid');
-    console.log("Kommentar hinzufügen:", commentText.value, "für Benutzer mit GUID", guid, "Mit date", new Date().toISOString());
-    const commentData = {
-      guid: guid,
-      text: commentText.value,
-      date: new Date().toISOString()
-    };
-    const response = await axios.post('https://localhost:7001/api/Post/comment', commentData);
-    console.log("Kommentar hinzugefügt:", response.data);
-    newComment.value = response.data.text; // Neue Kommentarantwort im neuen Kommentar anzeigen
-    // Hier kannst du weitere Schritte nach dem Hinzufügen des Kommentars einfügen, z.B. das Laden der aktualisierten Daten
-  } catch (error) {
-    console.error("Fehler beim Hinzufügen des Kommentars:", error);
-    // Hier kannst du eine Fehlerbehandlung hinzufügen
-  }
-}
-
-onMounted(fetchAllUserData);
-onMounted(fetchUserData);
 </script>
