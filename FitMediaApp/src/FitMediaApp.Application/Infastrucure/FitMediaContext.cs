@@ -86,7 +86,7 @@ namespace FitMediaApp.Application.Infastrucure
             return new Post(
                 user: f.PickRandom(users),
                 date: f.Date.Past(),
-                filePathPic: "Path/To/Your/Picture",
+                filePathPic: "uploads/chirs.png",
                 description: f.Lorem.Sentence())
                     { Guid = f.Random.Guid() };
             })

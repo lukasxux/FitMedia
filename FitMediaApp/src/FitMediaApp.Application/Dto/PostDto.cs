@@ -10,6 +10,7 @@ namespace FitMediaApp.Application.Dto
 
         public record PostDto(
         Guid Guid,
+        UserDtoForComment User,
         DateTime Date,
         string FilePathPic,
         string Description,
