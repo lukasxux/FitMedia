@@ -195,6 +195,10 @@ namespace FitMediaApp.Webapi.Controllers
             {
                 user.Mail = updateDto.Email;
             }
+            if (!string.IsNullOrEmpty(updateDto.Bio))
+            {
+                user.Bio = updateDto.Bio;
+            }
 
             try
             {
