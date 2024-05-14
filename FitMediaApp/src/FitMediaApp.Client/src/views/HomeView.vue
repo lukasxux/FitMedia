@@ -1,35 +1,26 @@
-<script setup>
-</script>
-
 <template>
   <div>
     <div>
       <h1><span style="color: rgb(74, 113, 165);">Fit-</span>Media</h1>
     </div>
     <div>
-      <h2 id="short-text">Willkommen zurück <Span style="color: rgb(74, 113, 165);">{{ username }}</Span>!</h2>
-      <h3 id="short-text">Hier sind die <Span style="color: rgb(74, 113, 165);">neuesten Beiträge</Span>, von denen die dir <Span style="color: rgb(74, 113, 165);">wichtig</Span> sind.</h3>
+      <h2 id="short-text">Willkommen zurück <span style="color: rgb(74, 113, 165);">{{ username }}</span>!</h2>
+      <h3 id="short-text">Hier sind die <span style="color: rgb(74, 113, 165);">neuesten Beiträge</span>, von denen die dir <span style="color: rgb(74, 113, 165);">wichtig</span> sind.</h3>
     </div>
     <div class="grid-container">
-        <div class="grid-item">
-          <H2>Luca</H2>
-          <img src="@/assets/Test-Bild.png" alt="" width="300">
-          <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
+      <div id="border" class="grid-item" v-for="post in Posts" :key="post.guid">
+          <h2>{{ post.user.username }}</h2>
+          <img :src="post.filePathPic" alt="" width="300" height="300">
+          <p id="Beitrag-Text">{{ post.description }}</p>
           <div>
-            <input type="text" v-model="commentText"> 
-            <button @click="addComment"><i class="bi bi-send-fill"></i></button>
+            <input type="text" v-model="post.commentText"> 
+            <button id="send" @click="addComment(post)">→</button>
+            <button id="like" @click="toggleLike(post)" :style="{ backgroundColor: post.isLiked ? 'red' : 'rgb(74, 113, 165)' }">
+              {{ post.isLiked ? '♡' : '♡' }}
+            </button>
           </div>
-          <p id="kommentar">{{ newComment }}</p>
-        </div>
-        <div class="grid-item">
-          <div class="grid-item">
-            <H2>Username</H2>
-            <img src="@/assets/Test-Bild.png" alt="" width="300">
-            <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
-            <div>
-              <input type="text"> 
-              <button><i class="bi bi-send-fill"></i></button>
-            </div>
+          <div class="comment">
+            <p id="single-comment" v-for="comment in post.comments" :key="comment.guid">{{ comment.text }}</p>
           </div>
         </div>
         <div class="item2">
@@ -37,30 +28,8 @@
             <h3>{{ user.username }}</h3>
             <img :src="`https://localhost:7001/${user.profilePicPath}`" alt="" width="150">
             <button id="folgen" @click="toggleFollowStatus(user)" :style="{ backgroundColor: checkFollowStatus(user.username) ? 'red' : 'rgb(74, 113, 165)' }">
-              {{ checkFollowStatus(user.username) ? 'Profil entfernen' : 'Profil folgen' }}
+              {{ checkFollowStatus(user.username) ? 'Profil entfolgen' : 'Profil folgen' }}
             </button>
-          </div>
-        </div>
-        <div class="grid-item">
-          <div class="grid-item">
-            <H2>Username</H2>
-            <img src="@/assets/Test-Bild.png" alt="" width="300">
-            <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
-            <div>
-              <input type="text"> 
-              <button><i class="bi bi-send-fill"></i></button>
-            </div>
-          </div>
-        </div>  
-        <div class="grid-item">
-          <div class="grid-item">
-            <H2>Username</H2>
-            <img src="@/assets/Test-Bild.png" alt="" width="300">
-            <p id="Beitrag-Text">Neue Bestzeit beim Laufen erreicht! 🏃‍♂️💪 Motivation tanken und Ziele übertreffen. #FitnessLife #LäuferHoch #GrenzenVerschieben</p>
-            <div>
-               <input type="text"> 
-              <button><i class="bi bi-send-fill"></i></button>
-            </div>
           </div>
         </div>
     </div>
@@ -68,6 +37,28 @@
 </template>
 
 <style scoped>
+#single-comment{
+  background-color: #0e0f10;
+  border-radius: 5px;
+  width: 250px;
+  padding-left: 5px;
+}
+
+#border {
+  background-color: #222427;
+  border-radius: 5px;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+  width: 300px;
+  height: 670px;
+  padding: 20px;
+  margin-bottom: 40px;
+}
+
+.comment {
+  height: 200px;
+  width: 300px;
+  overflow: auto;
+}
 .grid-container {
   display: grid;
   gap: 10px;
@@ -84,12 +75,25 @@
   height: 700px;
   width: 200px;
   margin-top: 45px;
+  background-color: #222427;
+  border-radius: 5px;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+  height: 670px;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.send{
+  margin-top: 6px;
 }
 
 #Beitrag-Text{
   overflow: auto;
-  height: 100px;
-  width: 300px;
+  width: 295px;
+  height: 70px;
+  background-color: rgb(26, 27, 28);
+  border-radius: 5px;
+  padding-left: 5px;
 }
 
 h1{
@@ -102,21 +106,32 @@ h1{
 }
 
 input{
-  width: 237.5px;
+  width: 210px;
   height: 27px;
   border-radius: 5px;
   border: 1px solid;
+  margin-bottom: 10px;
 }
 
-button{
-  padding-top: 10px;
+#send{
   margin-left: 10px;  
   width: 30px;
   height: 30px;
   background-color: rgb(74, 113, 165);
   border-radius: 5px;
   border: 1px solid rgb(74, 113, 165);
-  transition: transform 80ms ease-in;
+  color: white;
+}
+
+#like{
+  margin-left: 10px;  
+  margin-bottom: -10px;
+  width: 30px;
+  height: 30px;
+  background-color: rgb(74, 113, 165);
+  border-radius: 5px;
+  border: 1px solid rgb(28, 29, 29);
+  color: white;
 }
 
 #folgen{
@@ -130,9 +145,14 @@ button{
   font-weight: bold;
   transition: transform 80ms ease-in;
   padding-bottom: 25px;
+  padding-top: 10px;
   margin-top: 10px;
-  margin-right: 12px;
   margin-bottom: 20px;
+}
+
+h2{
+  margin-top: -10px;
+  margin-bottom: -5px;
 }
 </style>
 
@@ -141,14 +161,53 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
 const username = ref('');
-const commentText = ref('');
-const newComment = ref('');
 const users = ref([]);
+const Posts = ref([]);
 
 // Funktion zur Prüfung und Wiederherstellung des Follow-Status aus dem localStorage
 function checkFollowStatus(username) {
   const followStatus = localStorage.getItem(`followStatus_${username}`);
   return followStatus === 'true'; // Gibt true zurück, wenn Benutzer gefolgt ist, sonst false
+}
+
+async function fetchPostUser() {
+  try {
+    const response = await axios.get(`https://localhost:7001/api/Post?$expand=user,comments`);
+    Posts.value = response.data.slice(0, 4);
+    console.log(response.data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function addComment(post) {
+  console.log(post.guid);
+  try {
+    const response = await axios.post(`https://localhost:7001/api/Post/comment`, {
+      guid: post.guid,
+      text: post.commentText, // Verwende commentText, um den Kommentarwert zu erhalten
+      date: new Date().toISOString()
+    });
+    // Füge den neuen Kommentar direkt zur Liste der Kommentare hinzu, ohne die Seite neu zu laden
+    post.comments.push(response.data);
+    // Input-Feld leeren nach dem Hinzufügen
+    post.commentText = '';
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function toggleLike(post) {
+  try {
+    const response = await axios.post(`https://localhost:7001/api/Post/like/${post.guid}`);
+    console.log(`Dir gefällt der Beitrag ${post.guid}. API response:`, response.data);
+    // Ändere den Zustand des Like-Buttons und aktualisiere den lokalen Zustand des Beitrags
+    post.isLiked = !post.isLiked;
+    // Speichere den Zustand des Like-Buttons im lokalen Speicher
+    localStorage.setItem(`likeStatus_${post.guid}`, post.isLiked ? 'liked' : 'unliked');
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 // Funktion zum Ändern des Follow-Status im localStorage und lokalen Zustand
@@ -168,7 +227,6 @@ async function toggleFollowStatus(user) {
     });
     users.value = updatedUsers;
 
-    // API-Aufruf zum Folgen/Entfolgen des Benutzers
     const response = await axios.post(`https://localhost:7001/api/User/follow/${username}`);
     console.log(`Du folgst jetzt ${username}. API response:`, response.data);
   } catch (error) {
@@ -200,6 +258,7 @@ async function fetchAllUserData() {
 }
 
 onMounted(() => {
+  fetchPostUser();
   fetchAllUserData();
   fetchUserData();
 });
