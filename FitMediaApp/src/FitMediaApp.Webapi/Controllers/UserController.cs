@@ -159,6 +159,55 @@ namespace FitMediaApp.Webapi.Controllers
             catch (DbUpdateException e) { return BadRequest(e.Message); }
             return Ok(userSender.Username);
         }
+
+        [Authorize]
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateUser([FromBody] UserUpdateDto updateDto)
+        {
+            // Check if user is authenticated
+            var authenticated = HttpContext.User.Identity?.IsAuthenticated ?? false;
+            if (!authenticated)
+            {
+                return Unauthorized();
+            }
+
+            // Get the email of the authenticated user
+            var mail = HttpContext.User.Identity?.Name;
+            if (mail is null)
+            {
+                return Unauthorized();
+            }
+
+            // Find the user in the database
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Mail == mail);
+            if (user is null)
+            {
+                return Unauthorized();
+            }
+
+            // Update user properties
+            if (!string.IsNullOrEmpty(updateDto.Username))
+            {
+                user.Username = updateDto.Username;
+            }
+
+            if (!string.IsNullOrEmpty(updateDto.Email))
+            {
+                user.Mail = updateDto.Email;
+            }
+
+            try
+            {
+                _db.Users.Update(user);
+                await _db.SaveChangesAsync();
+            }
+            catch (DbUpdateException e)
+            {
+                return BadRequest(e.Message);
+            }
+
+            return Ok("User updated successfully");
+        }
     }
 }
 
