@@ -95,6 +95,15 @@ async function toggleOptions(index) {
   showOptions.value[index] = !showOptions.value[index];
 }
 
+async function deleteAccount() {
+  try {
+    await axios.delete(`https://localhost:7001/api/User`);
+    logout();
+  } catch (error) { 
+    console.error("Fehler beim Löschen des Benutzerkontos:", error);
+  }
+}
+
 async function deletePost(index) {
   try {
     const postGuid = posts.value[index].guid;
