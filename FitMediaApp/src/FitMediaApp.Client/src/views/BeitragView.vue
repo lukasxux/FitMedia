@@ -73,7 +73,7 @@ padding: 67px;
 }
 
 button:hover {
-  cursor: pointer; /* Ändere den Mauszeiger auf Zeiger, wenn über dem Button */
+  cursor: pointer;
 }
 
 button{
@@ -179,7 +179,6 @@ export default {
         
         console.log('Beitrag erfolgreich erstellt');
         window.location.href = "/profile";
-        // Reset der Eingaben nach erfolgreichem Speichern
         this.resetForm();
       } catch (error) {
         console.error('Fehler beim Erstellen des Beitrags:', error);
@@ -187,7 +186,6 @@ export default {
       }
     },
     resetForm() {
-      // Zurücksetzen der Eingabefelder
       this.post.description = "";
       this.post.file = null;
       this.post.imageUrl = "";

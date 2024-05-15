@@ -164,10 +164,9 @@ const username = ref('');
 const users = ref([]);
 const Posts = ref([]);
 
-// Funktion zur Prüfung und Wiederherstellung des Follow-Status aus dem localStorage
 function checkFollowStatus(username) {
   const followStatus = localStorage.getItem(`followStatus_${username}`);
-  return followStatus === 'true'; // Gibt true zurück, wenn Benutzer gefolgt ist, sonst false
+  return followStatus === 'true';
 }
 
 async function fetchPostUser() {
@@ -185,12 +184,10 @@ async function addComment(post) {
   try {
     const response = await axios.post(`https://localhost:7001/api/Post/comment`, {
       guid: post.guid,
-      text: post.commentText, // Verwende commentText, um den Kommentarwert zu erhalten
+      text: post.commentText,
       date: new Date().toISOString()
     });
-    // Füge den neuen Kommentar direkt zur Liste der Kommentare hinzu, ohne die Seite neu zu laden
     post.comments.push(response.data);
-    // Input-Feld leeren nach dem Hinzufügen
     post.commentText = '';
   } catch (error) {
     console.error(error);
@@ -201,16 +198,13 @@ async function toggleLike(post) {
   try {
     const response = await axios.post(`https://localhost:7001/api/Post/like/${post.guid}`);
     console.log(`Dir gefällt der Beitrag ${post.guid}. API response:`, response.data);
-    // Ändere den Zustand des Like-Buttons und aktualisiere den lokalen Zustand des Beitrags
     post.isLiked = !post.isLiked;
-    // Speichere den Zustand des Like-Buttons im lokalen Speicher
     localStorage.setItem(`likeStatus_${post.guid}`, post.isLiked ? 'liked' : 'unliked');
   } catch (error) {
     console.error(error);
   }
 }
 
-// Funktion zum Ändern des Follow-Status im localStorage und lokalen Zustand
 async function toggleFollowStatus(user) {
   try {
     const username = user.username;
@@ -218,7 +212,6 @@ async function toggleFollowStatus(user) {
     const newStatus = currentStatus === 'true' ? 'false' : 'true';
     localStorage.setItem(`followStatus_${username}`, newStatus);
 
-    // Lokalen Zustand aktualisieren
     const updatedUsers = users.value.map(u => {
       if (u.username === username) {
         return { ...u, isFollowed: newStatus === 'true' };
