@@ -172,7 +172,7 @@ function checkFollowStatus(username) {
 async function fetchPostUser() {
   try {
     const response = await axios.get(`https://localhost:7001/api/Post?$expand=user,comments`);
-    Posts.value = response.data.slice(0, 4);
+    Posts.value = response.data.slice(0, 100);
     console.log(response.data);
   } catch (error) {
     console.error(error);
